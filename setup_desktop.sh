@@ -85,6 +85,7 @@ echo_out() {
 install_mullvad () {
   echo_out "Installing Mullvad client."
   wget --content-disposition https://mullvad.net/download/app/deb/latest | tee /dev/fd/3
+  mv_package=$(cat ls | grep Mullvad)
   sudo apt-get -y install ./"${MV_PACKAGE}" | tee /dev/fd/3
   echo_out "Mullvad Installation Complete"
 }
@@ -108,12 +109,13 @@ install_protonvpn () {
 }
 
 usage() {
-  echo "Usage: ${0} [-cv] " >&2
-  echo "Sets up and starts wireguard server."
-  echo "Do not run as root."
-  echo "-c 		Check internet conenction before starting."
-  echo "-p 		Install VPN client(s)."
-  echo "-v 		Verbose mode."
+  echo "Usage: ${0} [-cv] [-p VPN_name] " >&2
+  echo "Sets up Ubuntu Desktop with useful apps."
+  #echo "Do not run as root."
+  echo
+  echo "-c 			Check internet connection before starting."
+  echo "-p VPN_NAME	Install VPN client(s)."
+  echo "-v 			Verbose mode."
   exit 1
 }
 
@@ -223,7 +225,8 @@ sudo apt-get -y install yubikey-manager | tee /dev/fd/3
 sudo apt-get -y install libykpers-1-1 | tee /dev/fd/3
 ##For yubikey authorization
 sudo apt-get -y install libpam-u2f | tee /dev/fd/3
-sudo wget https://raw.githubusercontent.com/Yubico/libu2f-host/master/70-u2f.rules /etc/udev/rules.d/70-u2f.rules
+sudo wget https://raw.githubusercontent.com/Yubico/libu2f-host/master/70-u2f.rules
+sudo mv 70-u2f.rules /etc/udev/rules.d/70-u2f.rules | tee /dev/fd/3
 sudo mkdir -p ~/.config/Yubico | tee /dev/fd/3
 printf "Complete\n\n" | tee /dev/fd/3
 
