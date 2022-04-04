@@ -1,0 +1,1 @@
+# docker-compose.yml\nversion: '3'\n\nservices:\n bitwarden:\n image: bitwardenrs/server\n restart: always\n ports:\n - 8000:80\n volumes:\n - ./bw-data:/data\n environment:\n WEBSOCKET_ENABLED: 'true' # Required to use websockets\n SIGNUPS_ALLOWED: 'true' # set to false to disable signups
