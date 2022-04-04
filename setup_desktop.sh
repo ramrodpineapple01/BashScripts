@@ -82,10 +82,19 @@ echo_out() {
   fi
 }
 
+install_airvpn () {
+  echo_out "Installing AirVPN client."
+  wget -qO - https://eddie.website/repository/keys/eddie_maintainer_gpg.key | sudo apt-key add - | tee /dev/fd/3
+  echo "deb http://eddie.website/repository/apt stable main" | sudo tee /etc/apt/sources.list.d/eddie.website.list | tee /dev/fd/3
+  sudo apt-get update | tee /dev/fd/3
+  sudo apt-get -y install eddie-ui | tee /dev/fd/3
+  echo_out "AirVPN Installation Complete"
+}
+
 install_mullvad () {
   echo_out "Installing Mullvad client."
   wget --content-disposition https://mullvad.net/download/app/deb/latest | tee /dev/fd/3
-  mv_package=$(cat ls | grep Mullvad)
+  MV_PACKAGE=$(cat ls | grep Mullvad)
   sudo apt-get -y install ./"${MV_PACKAGE}" | tee /dev/fd/3
   echo_out "Mullvad Installation Complete"
 }
@@ -241,6 +250,7 @@ case ${VPN_INSTALL} in
     return
 	;;
   all)
+    install_airvpn
     install_mullvad
     install_openvpn
 	install_protonvpn
