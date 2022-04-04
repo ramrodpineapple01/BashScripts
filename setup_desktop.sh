@@ -225,7 +225,7 @@ sudo apt-get -y install yubikey-manager | tee /dev/fd/3
 sudo apt-get -y install libykpers-1-1 | tee /dev/fd/3
 ##For yubikey authorization
 sudo apt-get -y install libpam-u2f | tee /dev/fd/3
-sudo wget https://raw.githubusercontent.com/Yubico/libu2f-host/master/70-u2f.rules
+wget https://raw.githubusercontent.com/Yubico/libu2f-host/master/70-u2f.rules | tee /dev/fd/3
 sudo mv 70-u2f.rules /etc/udev/rules.d/70-u2f.rules | tee /dev/fd/3
 sudo mkdir -p ~/.config/Yubico | tee /dev/fd/3
 printf "Complete\n\n" | tee /dev/fd/3
