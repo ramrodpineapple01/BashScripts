@@ -95,7 +95,7 @@ install_ivpn() {
   echo_out "Installing IVPN client."
   wget -O - https://repo.ivpn.net/stable/ubuntu/generic.gpg | gpg --dearmor > ~/ivpn-archive-keyring.gpg | tee /dev/fd/3
   sudo mv ~/ivpn-archive-keyring.gpg /usr/share/keyrings/ivpn-archive-keyring.gpg | tee /dev/fd/3
-  wget –O - https://repo.ivpn.net/stable/ubuntu/generic.list | sudo tee /etc/apt/sources.list.d/ivpn.list | tee /dev/fd/3
+  wget -O - https://repo.ivpn.net/stable/ubuntu/generic.list | sudo tee /etc/apt/sources.list.d/ivpn.list | tee /dev/fd/3
   sudo apt update | tee /dev/fd/3
   sudo apt-get install ivpn-ui | tee /dev/fd/3
   echo_out "IVPN Installation Complete"
