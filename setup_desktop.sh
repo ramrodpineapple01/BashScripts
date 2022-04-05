@@ -91,14 +91,30 @@ install_airvpn () {
   echo_out "AirVPN Installation Complete"
 }
 
+install_ivpn() {
+  echo_out "Installing IVPN client."
+  curl -fsSL https://repo.ivpn.net/stable/ubuntu/generic.gpg | gpg --dearmor > ~/ivpn-archive-keyring.gpg | tee /dev/fd/3
+  sudo mv ~/ivpn-archive-keyring.gpg /usr/share/keyrings/ivpn-archive-keyring.gpg | tee /dev/fd/3
+  curl -fsSL https://repo.ivpn.net/stable/ubuntu/generic.list | sudo tee /etc/apt/sources.list.d/ivpn.list | tee /dev/fd/3
+  sudo apt update | tee /dev/fd/3
+  sudo apt-get install ivpn-ui | tee /dev/fd/3
+  echo_out "IVPN Installation Complete"
+}
+
 install_mullvad () {
-  echo_out "Installing Mullvad client."
+  echo_out "Installing Mullvad VPN client."
   wget --content-disposition https://mullvad.net/download/app/deb/latest | tee /dev/fd/3
   MV_PACKAGE=$(cat ls | grep Mullvad)
   sudo apt-get -y install ./"${MV_PACKAGE}" | tee /dev/fd/3
-  echo_out "Mullvad Installation Complete"
+  echo_out "Mullvad Installation VPN Complete"
 }
 
+install_nordvpn () {
+  echo_out "Installing Nord VPN client."
+  sh <(curl -sSf https://downloads.nordcdn.com/apps/linux/install.sh) | tee /dev/fd/3
+  sudo usermod -aG nordvpn $USER | tee /dev/fd/3
+  echo_out "Nord VPN Installation Complete"
+}
 install_openvpn () {
   echo_out "Installing OpenVPNclient."
   sudo curl -fsSL https://swupdate.openvpn.net/repos/openvpn-repo-pkg-key.pub | gpg --dearmor > /etc/apt/trusted.gpg.d/openvpn-repo-pkg-keyring.gpg | tee /dev/fd/3
@@ -182,6 +198,7 @@ printf "Updating base OS\n" | tee /dev/fd/3
 sudo apt-get update | tee /dev/fd/3
 sudo apt-get -y install software-properties-common | tee /dev/fd/3
 sudo apt-get -y dist-upgrade | tee /dev/fd/3
+sudo apt-get -y install apt-transport-https | tee /dev/fd/3
 printf "Complete\n\n" | tee /dev/fd/3
 
 # Install VirtualBox Guest Additions:
@@ -251,12 +268,23 @@ case ${VPN_INSTALL} in
 	;;
   all)
     install_airvpn
+	install_ivpn
     install_mullvad
     install_openvpn
+	install_nordvpn
 	install_protonvpn
-    ;;	
+    ;;
+  airvpn)
+    install_airvpn
+	;;
+  ivpn)
+    install_ivpn
+	;;
   mullvad)
     install_mullvad
+	;;
+  nordvpn)
+    install_nordvpn
 	;;
   openvpn)
     install_openvpn
