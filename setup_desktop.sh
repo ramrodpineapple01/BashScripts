@@ -301,6 +301,7 @@ esac
 printf "Cleaning up\n" | tee /dev/fd/3
 sudo apt-get -y autoremove | tee /dev/fd/3
 sudo apt-get -y clean | tee /dev/fd/3
+sudo rm 70-u2f.rules | tee /dev/fd/3
 printf "Complete\n\n" | tee /dev/fd/3
 
 printf "\n\tPress [Enter] to reboot\n" 1>&3
