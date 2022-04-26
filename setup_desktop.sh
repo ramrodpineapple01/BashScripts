@@ -1,20 +1,22 @@
 #!/bin/bash
 # Ubuntu VM desktop setup script
 # R. Dawson 2021
-# v2.2.1
+# v2.2.2
 
 ## Variables
 #TODO: This works for a VM, but needs a better method
 ADAPTER1=$(ls /sys/class/net | grep e)   # 1st Ethernet adapter
 BRANCH="main"
+CHECK_IP="8.8.8.8"
 DATE_VAR=$(date +'%y%m%d-%H%M')  # Today's Date and time
+FLATPAK="false" # flatpak flag
 LOG_FILE="${DATE_VAR}_install.log"  # Log File name
 VPN_INSTALL="false"
 
 ## Functions
 check_internet() {
 	# SETTINGS
-	TEST="8.8.8.8"       # Test ping to google DNS
+	TEST="${1}"       # Test ping to google DNS
 
 	# Report 
 	LOG_FILE=~/Documents/ReportInternet.log
@@ -91,6 +93,12 @@ install_airvpn () {
   echo_out "AirVPN Installation Complete"
 }
 
+install_flatpak () {
+  sudo apt-get -y install flatpak
+  sudo apt-get -y install gnome-software-plugin-flatpak
+  flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+}
+
 install_ivpn() {
   echo_out "Installing IVPN client."
   wget -O - https://repo.ivpn.net/stable/ubuntu/generic.gpg | gpg --dearmor > ~/ivpn-archive-keyring.gpg | tee /dev/fd/3
@@ -134,11 +142,12 @@ install_protonvpn () {
 }
 
 usage() {
-  echo "Usage: ${0} [-cv] [-p VPN_name] " >&2
+  echo "Usage: ${0} [-cf] [-p VPN_name] " >&2
   echo "Sets up Ubuntu Desktop with useful apps."
   #echo "Do not run as root."
   echo
   echo "-c 			Check internet connection before starting."
+  echo "-f			Install Flatpak."
   echo "-p VPN_NAME	Install VPN client(s) or 'all'."
   echo "-v 			Verbose mode."
   exit 1
@@ -149,17 +158,23 @@ usage() {
 touch ${LOG_FILE}
 
 # Provide usage statement if no parameters
-while getopts vdcp: OPTION; do
+while getopts cdfp:p OPTION; do
   case ${OPTION} in
 	c)
 	# Check for internet connection
-	  check_internet
+	  check_internet "${CHECK_IP}"
 	  ;;
 	d)
 	# Set installation to dev branch
 	  BRANCH="dev"
 	  echo_out "Branch set to dev branch"
 	  ;;
+	f)
+	# Flag for flatpak installation
+	  FLATPAK="true"
+	  echo_out "Flatpak use set to true"
+	  install_flatpak
+	  ;;  
 	p)
 	  VPN_INSTALL="${OPTARG}"
 	  ;;
@@ -233,8 +248,17 @@ sudo apt-get -y install veracrypt | tee /dev/fd/3
 printf "Complete\n\n" | tee /dev/fd/3
 
 # Onionshare:
-#TODO: troubleshoot onionshare installation
+#TODO: troubleshoot onionshare snap installation
 printf "Installing Onionshare\n" | tee /dev/fd/3
+# Github install
+curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python - | tee /dev/fd/3
+
+# Flatpak install
+if [[ ${FLATPAK} == 'true' ]]; then
+  flatpak install flathub org.onionshare.OnionShare | tee /dev/fd/3
+fi
+
+# Snap install
 sudo snap install onionshare | tee /dev/fd/3
 sudo snap connect onionshare:removable-media | tee /dev/fd/3
 printf "Complete\n\n" | tee /dev/fd/3
