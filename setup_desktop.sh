@@ -203,9 +203,13 @@ printf "\nPlease be patient\n\n" 1>&3
 
 # Add Repositories
 printf "Adding Repositories\n" | tee /dev/fd/3
+echo_out "1"
 sudo add-apt-repository multiverse | tee /dev/fd/3
+echo_out "\b2"
 sudo add-apt-repository -y ppa:unit193/encryption | tee /dev/fd/3
+echo_out "\b3"
 sudo add-apt-repository -y ppa:yubico/stable | tee /dev/fd/3
+echo_out "\b4"
 sudo add-apt-repository -y ppa:nextcloud-devs/client | tee /dev/fd/3
 printf "Complete\n\n" | tee /dev/fd/3
 
