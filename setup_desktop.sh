@@ -263,11 +263,11 @@ printf "Installing Onionshare\n" | tee /dev/fd/3
 # Flatpak install
 if [[ ${FLATPAK} == 'true' ]]; then
   flatpak install flathub org.onionshare.OnionShare | tee /dev/fd/3
-fi
-
+else
 # Snap install
-sudo snap install onionshare | tee /dev/fd/3
-sudo snap connect onionshare:removable-media | tee /dev/fd/3
+  sudo snap install onionshare | tee /dev/fd/3
+  sudo snap connect onionshare:removable-media | tee /dev/fd/3
+fi
 printf "Complete\n\n" | tee /dev/fd/3
 
 # KeepassXC:
