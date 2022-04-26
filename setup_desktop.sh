@@ -5,18 +5,18 @@
 
 ## Variables
 #TODO: This works for a VM, but needs a better method
-ADAPTER1=$(ls /sys/class/net | grep e)   # 1st Ethernet adapter
-BRANCH="main"
-CHECK_IP="8.8.8.8"
-DATE_VAR=$(date +'%y%m%d-%H%M')  # Today's Date and time
-FLATPAK="false" # flatpak flag
-LOG_FILE="${DATE_VAR}_install.log"  # Log File name
-VPN_INSTALL="false"
+ADAPTER1=$(ls /sys/class/net | grep e) 	# 1st Ethernet adapter on VM
+BRANCH="main"							# Default to main branch
+CHECK_IP="8.8.8.8"						# Test ping to google DNS
+DATE_VAR=$(date +'%y%m%d-%H%M')			# Today's Date and time
+FLATPAK="false" 						# Do not install flakpak by default
+LOG_FILE="${DATE_VAR}_install.log"  	# Log File name
+VPN_INSTALL="false"						# Do not install VPN clients by default
 
 ## Functions
 check_internet() {
 	# SETTINGS
-	TEST="${1}"       # Test ping to google DNS
+	TEST="${1}"       
 
 	# Report 
 	LOG_FILE=~/Documents/ReportInternet.log
@@ -43,7 +43,7 @@ check_internet() {
 	resolve() {
 		clear
 		echo "$MESSAGE1" | tee /dev/fd/3
-		sudo ifconfig $ADAPTER1 up;sudo dhclient -r $ADAPTER1;sleep 5;sudo dhclient $ADAPTER1
+		sudo ifconfig $ADAPTER1 up; sudo dhclient -r $ADAPTER1; sleep 5; sudo dhclient $ADAPTER1
 		echo "$MESSAGE2"
 		sleep 120
 	}
@@ -250,8 +250,15 @@ printf "Complete\n\n" | tee /dev/fd/3
 # Onionshare:
 #TODO: troubleshoot onionshare snap installation
 printf "Installing Onionshare\n" | tee /dev/fd/3
-# Github install
-curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python - | tee /dev/fd/3
+# Github install ** TESTING ONLY **
+#curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python - | tee /dev/fd/3
+#git clone https://github.com/onionshare/onionshare.git | tee /dev/fd/3
+#cd onionshare/desktop
+#poetry install
+#poetry run ./scripts/get-tor-linux.py
+#curl -sSL https://go.dev/dl/go1.18.1.linux-amd64.tar.gz
+#sudo rm -rf /usr/local/go && tar -C /usr/local -xzf go1.18.1.linux-amd64.tar.gz
+#echo 'export PATH=$PATH:/usr/local/go/bin' | tee -a .bashrc .profile
 
 # Flatpak install
 if [[ ${FLATPAK} == 'true' ]]; then
