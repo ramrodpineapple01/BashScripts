@@ -1,7 +1,7 @@
 #!/bin/bash
 # Ubuntu VM desktop setup script
 # R. Dawson 2021
-# v2.2.0
+# v2.2.1
 
 ## Variables
 #TODO: This works for a VM, but needs a better method
@@ -139,7 +139,7 @@ usage() {
   #echo "Do not run as root."
   echo
   echo "-c 			Check internet connection before starting."
-  echo "-p VPN_NAME	Install VPN client(s)."
+  echo "-p VPN_NAME	Install VPN client(s) or 'all'."
   echo "-v 			Verbose mode."
   exit 1
 }
@@ -188,9 +188,10 @@ printf "\nPlease be patient\n\n" 1>&3
 
 # Add Repositories
 printf "Adding Repositories\n" | tee /dev/fd/3
-sudo add-apt-repository -y ppa:unit193/encryption
-sudo add-apt-repository -y ppa:yubico/stable
-sudo add-apt-repository -y ppa:nextcloud-devs/client
+sudo add-apt-repository multiverse | tee /dev/fd/3
+sudo add-apt-repository -y ppa:unit193/encryption | tee /dev/fd/3
+sudo add-apt-repository -y ppa:yubico/stable | tee /dev/fd/3
+sudo add-apt-repository -y ppa:nextcloud-devs/client | tee /dev/fd/3
 printf "Complete\n\n" | tee /dev/fd/3
 
 # Update the base OS
@@ -240,9 +241,11 @@ printf "Complete\n\n" | tee /dev/fd/3
 
 # KeepassXC:
 printf "Installing KeePassXC\n" | tee /dev/fd/3
-sudo snap install keepassxc | tee /dev/fd/3
-sudo snap connect keepassxc:raw-usb | tee /dev/fd/3
-sudo snap connect keepassxc:removable-media | tee /dev/fd/3
+sudo apt-get -y install keepassxc | tee /dev/fd/3
+#TODO: Confirm this works with 22.04
+#sudo snap install keepassxc | tee /dev/fd/3
+#sudo snap connect keepassxc:raw-usb | tee /dev/fd/3
+#sudo snap connect keepassxc:removable-media | tee /dev/fd/3
 printf "Complete\n\n" | tee /dev/fd/3
 
 #Yubikey:
