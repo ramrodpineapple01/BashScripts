@@ -1,7 +1,7 @@
 #!/bin/bash
 # Ubuntu VM desktop setup script
 # R. Dawson 2021
-# v2.2.2
+# v2.3.0
 
 ## Variables
 #TODO: This works for a VM, but needs a better method
@@ -204,13 +204,13 @@ printf "\nPlease be patient\n\n" 1>&3
 # Add Repositories
 printf "Adding Repositories\n" | tee /dev/fd/3
 echo_out "1"
-sudo add-apt-repository multiverse | tee /dev/fd/3
+sudo add-apt-repository multiverse
 echo_out "\b2"
-sudo add-apt-repository -y ppa:unit193/encryption | tee /dev/fd/3
+sudo add-apt-repository -y ppa:unit193/encryption
 echo_out "\b3"
-sudo add-apt-repository -y ppa:yubico/stable | tee /dev/fd/3
+sudo add-apt-repository -y ppa:yubico/stable
 echo_out "\b4"
-sudo add-apt-repository -y ppa:nextcloud-devs/client | tee /dev/fd/3
+sudo add-apt-repository -y ppa:nextcloud-devs/client
 printf "Complete\n\n" | tee /dev/fd/3
 
 # Update the base OS
@@ -236,7 +236,8 @@ printf "Complete\n\n" | tee /dev/fd/3
 
 # GTKHash:
 printf "Installing GTKHash\n" | tee /dev/fd/3
-sudo snap install gtkhash | tee /dev/fd/3
+sudo apt-get install -y gtkhash | tee /dev/fd/3
+#sudo snap install gtkhash | tee /dev/fd/3
 printf "Complete\n\n" | tee /dev/fd/3
 
 # Veracrypt:
