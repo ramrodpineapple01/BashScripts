@@ -1,7 +1,7 @@
 #!/bin/bash
 # Ubuntu VM desktop setup script
 # R. Dawson 2021
-# v2.3.1
+# v2.3.2
 
 ## Variables
 #TODO: ADAPTER: This works for a VM, but needs a better method
@@ -288,21 +288,22 @@ printf "Complete\n\n" | tee /dev/fd/3
 
 # KeepassXC:
 printf "Installing KeePassXC\n" | tee /dev/fd/3
-sudo apt-get -y install keepassxc | echo_out
+#sudo apt-get -y install keepassxc | echo_out
 #TODO: Confirm this works with 22.04
-#sudo snap install keepassxc | tee /dev/fd/3
-#sudo snap connect keepassxc:raw-usb | tee /dev/fd/3
-#sudo snap connect keepassxc:removable-media | tee /dev/fd/3
+sudo snap install keepassxc | echo_out
+sudo snap connect keepassxc:raw-usb | echo_out
+sudo snap connect keepassxc:removable-media | echo_out
 printf "Complete\n\n" | tee /dev/fd/3
 
 #Yubikey:
 printf "Installing Yubikey\n" | tee /dev/fd/3
 sudo apt-get -y install yubikey-manager | echo_out
 sudo apt-get -y install libykpers-1-1 | echo_out
-##For yubikey authorization
+
+#For yubikey authorization
 sudo apt-get -y install libpam-u2f | echo_out
-wget https://raw.githubusercontent.com/Yubico/libu2f-host/master/70-u2f.rules | echo_out
-sudo mv 70-u2f.rules /etc/udev/rules.d/70-u2f.rules | tee /dev/fd/3
+sudo wget https://raw.githubusercontent.com/Yubico/libu2f-host/master/70-u2f.rules -O /etc/udev/rules.d/70-u2f.rules | echo_out
+#sudo mv 70-u2f.rules /etc/udev/rules.d/70-u2f.rules | tee /dev/fd/3
 sudo mkdir -p ~/.config/Yubico | tee /dev/fd/3
 printf "Complete\n\n" | tee /dev/fd/3
 
