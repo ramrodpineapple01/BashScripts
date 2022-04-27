@@ -242,7 +242,7 @@ sudo apt-get -y install make | echo_out
 sudo apt-get -y install perl | echo_out
 sudo apt-get -y install virtualbox-guest-additions-iso | echo_out
 sudo mount -o loop /usr/share/virtualbox/VBoxGuestAdditions.iso /media/ | echo_out
-sudo sh /media/autorun.sh
+/media/autorun.sh
 printf "\nComplete\n\n" | tee /dev/fd/3
 
 # Install Tor Browser:
