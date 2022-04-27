@@ -82,7 +82,7 @@ echo_out() {
   local MESSAGE=${1:-$(</dev/stdin)}
   
   # Check to see if we need a \n
-  if [[ "{$2}" == 'n' ]]; then
+  if [[ "${2}" == 'n' ]]; then
     :
   else
     MESSAGE="${MESSAGE}\n"
