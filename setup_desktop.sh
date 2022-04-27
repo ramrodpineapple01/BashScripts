@@ -1,7 +1,7 @@
 #!/bin/bash
 # Ubuntu VM desktop setup script
 # R. Dawson 2021
-# v2.3.2
+# v2.3.3
 
 ## Variables
 #TODO: ADAPTER: This works for a VM, but needs a better method
@@ -234,7 +234,7 @@ printf "\nComplete\n\n" | tee /dev/fd/3
 
 # Install VirtualBox Guest Additions:
 printf "Installing VirtualBox Guest Additions\n" | tee /dev/fd/3
-sudo apt-get -y install virtualbox-guest-dkms | echo_out
+sudo apt-get -y install virtualbox-guest-utils | echo_out
 sudo apt-get -y install virtualbox-guest-x11 | echo_out
 printf "\nComplete\n\n" | tee /dev/fd/3
 
