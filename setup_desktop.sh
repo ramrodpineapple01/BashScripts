@@ -4,13 +4,13 @@
 # v2.3.0
 
 ## Variables
-#TODO: This works for a VM, but needs a better method
+#TODO: ADAPTER: This works for a VM, but needs a better method
 ADAPTER1=$(ls /sys/class/net | grep e) 	# 1st Ethernet adapter on VM
 BRANCH="main"							# Default to main branch
 CHECK_IP="8.8.8.8"						# Test ping to google DNS
 DATE_VAR=$(date +'%y%m%d-%H%M')			# Today's Date and time
-FLATPAK="false" 						# Do not install flakpak by default
 LOG_FILE="${DATE_VAR}_install.log"  	# Log File name
+PACKAGE="snap" 							# Install snaps by default
 VPN_INSTALL="false"						# Do not install VPN clients by default
 
 ## Functions
@@ -78,9 +78,19 @@ check_root() {
 }
 
 echo_out() {
-  local MESSAGE="${@}"
+  # Get input from stdin OR $1
+  local MESSAGE=${1:-$(</dev/stdin)}
+  
+  # Check to see if we need a \n
+  if [[ "{$2}" == 'n' ]]; then
+    MESSAGE="${MESSAGE}\n"
+  fi
+  
+  # Decide if we output to console and log or just log
   if [[ "${VERBOSE}" = 'true' ]]; then
-    printf "${MESSAGE}\n"
+    printf "${MESSAGE}" | tee /dev/fd/3
+  else 
+    printf "${MESSAGE}" >> ${LOG_FILE}
   fi
 }
 
@@ -157,8 +167,11 @@ usage() {
 # Create a log file with current date and time
 touch ${LOG_FILE}
 
+# Redirect outputs
+exec 3>&1 1>>${LOG_FILE} 2>&1
+
 # Provide usage statement if no parameters
-while getopts cdfp:p OPTION; do
+while getopts cdfp:v OPTION; do
   case ${OPTION} in
 	c)
 	# Check for internet connection
@@ -171,7 +184,7 @@ while getopts cdfp:p OPTION; do
 	  ;;
 	f)
 	# Flag for flatpak installation
-	  FLATPAK="true"
+	  PACKAGE="flatpak"
 	  echo_out "Flatpak use set to true"
 	  install_flatpak
 	  ;;  
@@ -193,21 +206,18 @@ done
 # Clear the options from the arguments
 shift "$(( OPTIND - 1 ))"
 
-# Redirect outputs
-exec 3>&1 1>>${LOG_FILE} 2>&1
-
 # Start installation message
-printf "\nConfiguring Ubuntu Desktop\n\n" 1>&3
-printf "\nThis may take some time and the system may appear to be unresponsive\n\n" 1>&3
+printf "\nConfiguring Ubuntu Desktop\n" 1>&3
+printf "\nThis may take some time and the system may appear to be unresponsive\n" 1>&3
 printf "\nPlease be patient\n\n" 1>&3
 
 # Add Repositories
 printf "Adding Repositories\n" | tee /dev/fd/3
-echo_out "1"
-sudo add-apt-repository multiverse
-echo_out "\b2"
+echo_out "1" n
+sudo add-apt-repository -y multiverse
+echo_out "\b2" n
 sudo add-apt-repository -y ppa:unit193/encryption
-echo_out "\b3"
+echo_out "\b3" n
 sudo add-apt-repository -y ppa:yubico/stable
 echo_out "\b4"
 sudo add-apt-repository -y ppa:nextcloud-devs/client
@@ -265,14 +275,15 @@ printf "Installing Onionshare\n" | tee /dev/fd/3
 #sudo rm -rf /usr/local/go && tar -C /usr/local -xzf go1.18.1.linux-amd64.tar.gz
 #echo 'export PATH=$PATH:/usr/local/go/bin' | tee -a .bashrc .profile
 
-# Flatpak install
-if [[ ${FLATPAK} == 'true' ]]; then
-  flatpak install flathub org.onionshare.OnionShare | tee /dev/fd/3
-else
-# Snap install
-  sudo snap install onionshare | tee /dev/fd/3
-  sudo snap connect onionshare:removable-media | tee /dev/fd/3
-fi
+case $PACKAGE in:
+  flatpak)
+    flatpak install flathub org.onionshare.OnionShare | tee /dev/fd/3
+	;;
+  snap)
+    sudo snap install onionshare | tee /dev/fd/3
+    sudo snap connect onionshare:removable-media | tee /dev/fd/3
+	;;
+esac
 printf "Complete\n\n" | tee /dev/fd/3
 
 # KeepassXC:
