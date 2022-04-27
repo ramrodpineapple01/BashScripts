@@ -210,6 +210,7 @@ shift "$(( OPTIND - 1 ))"
 printf "\nConfiguring Ubuntu Desktop\n" 1>&3
 printf "\nThis may take some time and the system may appear to be unresponsive\n" 1>&3
 printf "\nPlease be patient\n\n" 1>&3
+sudo :
 
 # Add Repositories
 printf "Adding Repositories\n" | tee /dev/fd/3
@@ -221,7 +222,7 @@ echo_out "\b3" n
 sudo add-apt-repository -y ppa:yubico/stable
 echo_out "\b4"
 sudo add-apt-repository -y ppa:nextcloud-devs/client
-printf "Complete\n\n" | tee /dev/fd/3
+printf "\nComplete\n\n" | tee /dev/fd/3
 
 # Update the base OS
 printf "Updating base OS\n" | tee /dev/fd/3
@@ -229,26 +230,26 @@ sudo apt-get update | echo_out
 sudo apt-get -y install software-properties-common | echo_out
 sudo apt-get -y dist-upgrade | echo_out
 sudo apt-get -y install apt-transport-https | echo_out
-printf "Complete\n\n" | tee /dev/fd/3
+printf "\nComplete\n\n" | tee /dev/fd/3
 
 # Install VirtualBox Guest Additions:
 printf "Installing VirtualBox Guest Additions\n" | tee /dev/fd/3
 sudo apt-get -y install virtualbox-guest-dkms | echo_out
 sudo apt-get -y install virtualbox-guest-x11 | echo_out
-printf "Complete\n\n" | tee /dev/fd/3
+printf "\nComplete\n\n" | tee /dev/fd/3
 
 # Install Tor Browser:
 printf "Installing TOR browser bundle\n" | tee /dev/fd/3
 ## You may need this if you get a key error
 # gpg --homedir "$HOME/.local/share/torbrowser/gnupg_homedir" --refresh-keys --keyserver keyserver.ubuntu.com
 sudo apt-get -y install torbrowser-launcher | echo_out
-printf "Complete\n\n" | tee /dev/fd/3
+printf "\nComplete\n\n" | tee /dev/fd/3
 
 # GTKHash:
 printf "Installing GTKHash\n" | tee /dev/fd/3
 sudo apt-get install -y gtkhash | echo_out
 #sudo snap install gtkhash | tee /dev/fd/3
-printf "Complete\n\n" | tee /dev/fd/3
+printf "\nComplete\n\n" | tee /dev/fd/3
 
 # Veracrypt:
 printf "Installing Veracrypt\n" | tee /dev/fd/3
@@ -260,7 +261,7 @@ sudo apt-get -y install veracrypt | echo_out
 ## Option 2
 #sudo wget https://launchpad.net/veracrypt/trunk/1.24-update7/+download/veracrypt-console-1.24-Update7-Ubuntu-20.04-amd64.deb
 #sudo apt-get -y install ./veracrypt-console-1.24-Update7-Ubuntu-20.04-amd64.deb | tee /dev/fd/3
-printf "Complete\n\n" | tee /dev/fd/3
+printf "\nComplete\n\n" | tee /dev/fd/3
 
 # Onionshare:
 #TODO: troubleshoot onionshare snap installation
@@ -284,7 +285,7 @@ case ${PACKAGE} in
     sudo snap connect onionshare:removable-media | echo_out
 	;;
 esac
-printf "Complete\n\n" | tee /dev/fd/3
+printf "\nComplete\n\n" | tee /dev/fd/3
 
 # KeepassXC:
 printf "Installing KeePassXC\n" | tee /dev/fd/3
@@ -293,7 +294,7 @@ printf "Installing KeePassXC\n" | tee /dev/fd/3
 sudo snap install keepassxc | echo_out
 sudo snap connect keepassxc:raw-usb | echo_out
 sudo snap connect keepassxc:removable-media | echo_out
-printf "Complete\n\n" | tee /dev/fd/3
+printf "\nComplete\n\n" | tee /dev/fd/3
 
 #Yubikey:
 printf "Installing Yubikey\n" | tee /dev/fd/3
@@ -305,12 +306,12 @@ sudo apt-get -y install libpam-u2f | echo_out
 sudo wget https://raw.githubusercontent.com/Yubico/libu2f-host/master/70-u2f.rules -O /etc/udev/rules.d/70-u2f.rules | echo_out
 #sudo mv 70-u2f.rules /etc/udev/rules.d/70-u2f.rules | tee /dev/fd/3
 sudo mkdir -p ~/.config/Yubico | tee /dev/fd/3
-printf "Complete\n\n" | tee /dev/fd/3
+printf "\nComplete\n\n" | tee /dev/fd/3
 
 #Nextcloud:
 printf "Installing Nextcloud Client\n" | tee /dev/fd/3
 sudo apt-get -y install nextcloud-client | echo_out
-printf "Complete\n\n" | tee /dev/fd/3
+printf "\nComplete\n\n" | tee /dev/fd/3
 
 # VPN Clients
 case ${VPN_INSTALL} in
@@ -353,7 +354,7 @@ printf "Cleaning up\n" | tee /dev/fd/3
 sudo apt-get -y autoremove | tee /dev/fd/3
 sudo apt-get -y clean | tee /dev/fd/3
 sudo rm 70-u2f.rules | tee /dev/fd/3
-printf "Complete\n\n" | tee /dev/fd/3
+printf "\nComplete\n\n" | tee /dev/fd/3
 
 printf "\n\tPress [Enter] to reboot\n" 1>&3
 read throwaway
