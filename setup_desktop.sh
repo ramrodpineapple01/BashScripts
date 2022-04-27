@@ -1,7 +1,7 @@
 #!/bin/bash
 # Ubuntu VM desktop setup script
 # R. Dawson 2021
-# v2.3.0
+# v2.3.1
 
 ## Variables
 #TODO: ADAPTER: This works for a VM, but needs a better method
@@ -314,7 +314,7 @@ printf "Complete\n\n" | tee /dev/fd/3
 # VPN Clients
 case ${VPN_INSTALL} in
   false)
-    return
+    :
 	;;
   all)
     install_airvpn
