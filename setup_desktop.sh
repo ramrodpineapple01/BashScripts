@@ -237,8 +237,6 @@ printf "\nComplete\n\n" | tee /dev/fd/3
 # Install VirtualBox Guest Additions:
 printf "Installing VirtualBox Guest Additions\n" | tee /dev/fd/3
 sudo apt-get -y install dkms | echo_out
-sudo apt-get -y install linux-headers-$(uname -r) | echo_out
-sudo apt-get -y install build-essential | echo_out
 sudo apt-get -y install virtualbox-guest-utils | echo_out
 sudo apt-get -y install virtualbox-guest-x11 | echo_out
 printf "\nComplete\n\n" | tee /dev/fd/3
