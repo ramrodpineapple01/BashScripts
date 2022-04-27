@@ -237,8 +237,12 @@ printf "\nComplete\n\n" | tee /dev/fd/3
 # Install VirtualBox Guest Additions:
 printf "Installing VirtualBox Guest Additions\n" | tee /dev/fd/3
 sudo apt-get -y install dkms | echo_out
-sudo apt-get -y install virtualbox-guest-utils | echo_out
-sudo apt-get -y install virtualbox-guest-x11 | echo_out
+sudo apt-get -y install gcc | echo_out
+sudo apt-get -y install make | echo_out
+sudo apt-get -y install perl | echo_out
+sudo apt-get -y install virtualbox-guest-additions-iso | echo_out
+sudo mount -o loop /usr/share/virtualbox/VBoxGuestAdditions.iso /media/ | echo_out
+sudo sh /media/autorun.sh
 printf "\nComplete\n\n" | tee /dev/fd/3
 
 # Install Tor Browser:
@@ -312,7 +316,7 @@ sudo mkdir -p ~/.config/Yubico | tee /dev/fd/3
 printf "\nComplete\n\n" | tee /dev/fd/3
 
 #Nextcloud:
-printf "Installing Nextcloud Client\n" | tee /dev/fd/3
+printf "Installing Nextcloud Client\n\nThis can take a while\n" | tee /dev/fd/3
 sudo apt-get -y install nextcloud-client | echo_out
 printf "\nComplete\n\n" | tee /dev/fd/3
 
@@ -354,9 +358,9 @@ esac
 
 # Cleanup
 printf "Cleaning up\n" | tee /dev/fd/3
-sudo apt-get -y autoremove | tee /dev/fd/3
-sudo apt-get -y clean | tee /dev/fd/3
-sudo rm 70-u2f.rules | tee /dev/fd/3
+sudo apt-get -y autoremove | echo_out
+sudo apt-get -y clean | echo_out
+sudo rm 70-u2f.rules | echo_out # May not exist
 printf "\nComplete\n\n" | tee /dev/fd/3
 
 printf "\n\tPress [Enter] to reboot\n" 1>&3
