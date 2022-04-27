@@ -83,6 +83,8 @@ echo_out() {
   
   # Check to see if we need a \n
   if [[ "{$2}" == 'n' ]]; then
+    :
+  else
     MESSAGE="${MESSAGE}\n"
   fi
   
