@@ -1,7 +1,7 @@
 #!/bin/bash
 # Ubuntu VM desktop setup script
 # R. Dawson 2021
-# v2.3.4
+# v2.4.0
 
 ## Variables
 #TODO: ADAPTER: This works for a VM, but needs a better method
@@ -97,69 +97,73 @@ echo_out() {
 }
 
 install_airvpn () {
-  echo_out "Installing AirVPN client."
+  printf "Installing AirVPN client.\n" | tee /dev/fd/3
   wget -qO - https://eddie.website/repository/keys/eddie_maintainer_gpg.key | sudo apt-key add - | echo_out
   echo "deb http://eddie.website/repository/apt stable main" | sudo tee /etc/apt/sources.list.d/eddie.website.list | echo_out
   sudo apt-get update | echo_out
   sudo apt-get -y install eddie-ui | echo_out
-  echo_out "AirVPN Installation Complete"
+  printf "AirVPN Installation Complete.\n\n" | tee /dev/fd/3
 }
 
 install_flatpak () {
+  printf "Installing Flatpak.\n" | tee /dev/fd/3
   sudo apt-get -y install flatpak | echo_out
   sudo apt-get -y install gnome-software-plugin-flatpak | echo_out
-  flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+  flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo | echo_out
+  printf "Flatpak Installation Complete.\n\n" | tee /dev/fd/3
 }
 
 install_ivpn() {
-  echo_out "Installing IVPN client."
+  printf "Installing IVPN client.\n" | tee /dev/fd/3
   wget -O - https://repo.ivpn.net/stable/ubuntu/generic.gpg | gpg --dearmor > ~/ivpn-archive-keyring.gpg | echo_out
   sudo mv ~/ivpn-archive-keyring.gpg /usr/share/keyrings/ivpn-archive-keyring.gpg | echo_out
   wget -O - https://repo.ivpn.net/stable/ubuntu/generic.list | sudo tee /etc/apt/sources.list.d/ivpn.list | echo_out
   sudo apt update | echo_out
   sudo apt-get -y install ivpn-ui | echo_out
-  echo_out "IVPN Installation Complete"
+  printf "IVPN Installation Complete.\n\n" | tee /dev/fd/3
 }
 
 install_mullvad () {
-  echo_out "Installing Mullvad VPN client."
+  printf "Installing Mullvad VPN client.\n" | tee /dev/fd/3
   wget --content-disposition https://mullvad.net/download/app/deb/latest | echo_out
   MV_PACKAGE=$(cat ls | grep Mullvad)
   sudo apt-get -y install ./"${MV_PACKAGE}" | echo_out
-  echo_out "Mullvad Installation VPN Complete"
+  printf "Mullvad Installation VPN Complete.\n\n" | tee /dev/fd/3
 }
 
 install_nordvpn () {
-  echo_out "Installing Nord VPN client."
+  printf "Installing Nord VPN client.\n" | tee /dev/fd/3
   sh <(curl -sSf https://downloads.nordcdn.com/apps/linux/install.sh) | echo_out
   sudo usermod -aG nordvpn $USER | echo_out
-  echo_out "Nord VPN Installation Complete"
+  printf "Nord VPN Installation Complete.\n\n" | tee /dev/fd/3
 }
+
 install_openvpn () {
-  echo_out "Installing OpenVPNclient."
+  printf "Installing OpenVPNclient.\n" | tee /dev/fd/3
   sudo curl -fsSL https://swupdate.openvpn.net/repos/openvpn-repo-pkg-key.pub | gpg --dearmor > /etc/apt/trusted.gpg.d/openvpn-repo-pkg-keyring.gpg | echo_out
   sudo curl -fsSL https://swupdate.openvpn.net/community/openvpn3/repos/openvpn3-$DISTRO.list >/etc/apt/sources.list.d/openvpn3.list | echo_out
   sudo apt-get update | echo_out
   sudo apt-get -y install openvpn3 | echo_out
-  echo_out "OpenVPN Installation Complete"
+  printf "OpenVPN Installation Complete.\n\n" | tee /dev/fd/3
 }
 
 install_protonvpn () {
-  printf "Installing ProtonVPNclient.\n"
+  printf "Installing ProtonVPNclient.\n" | tee /dev/fd/3
   wget https://protonvpn.com/download/protonvpn-stable-release_1.0.1-1_all.deb
   sudo apt install protonvpn-stable-release_1.0.1-1_all.deb | echo_out
   sudo apt update | echo_out
   sudo apt-get -y install protonvpn | echo_out
-  echo_out "ProtonVPN Installation Complete"
+  printf "ProtonVPN Installation Complete.\n\n" | tee /dev/fd/3
 }
 
 usage() {
-  echo "Usage: ${0} [-cf] [-p VPN_name] " >&2
+  echo "Usage: ${0} [-cfh] [-p VPN_name] " >&2
   echo "Sets up Ubuntu Desktop with useful apps."
   #echo "Do not run as root."
   echo
   echo "-c 			Check internet connection before starting."
   echo "-f			Install Flatpak."
+  echo "-h 			Help (this list)."
   echo "-p VPN_NAME	Install VPN client(s) or 'all'."
   echo "-v 			Verbose mode."
   exit 1
@@ -190,6 +194,9 @@ while getopts cdfp:v OPTION; do
 	  echo_out "Flatpak use set to true"
 	  install_flatpak
 	  ;;  
+	h)
+	  usage
+	  ;;
 	p)
 	  VPN_INSTALL="${OPTARG}"
 	  ;;
@@ -249,7 +256,17 @@ printf "Complete\n\n" | tee /dev/fd/3
 printf "Installing TOR browser bundle\n" | tee /dev/fd/3
 ## You may need this if you get a key error
 # gpg --homedir "$HOME/.local/share/torbrowser/gnupg_homedir" --refresh-keys --keyserver keyserver.ubuntu.com
-sudo apt-get -y install torbrowser-launcher | echo_out
+case ${PACKAGE} in
+  flatpak)
+    flatpak install flathub com.github.micahflee.torbrowser-launcher -y
+    ;;
+  snap)
+    ;;
+  *)
+    sudo apt-get -y install torbrowser-launcher | echo_out
+	;;
+esac
+
 printf "Complete\n\n" | tee /dev/fd/3
 
 # GTKHash:
@@ -273,21 +290,25 @@ printf "Complete\n\n" | tee /dev/fd/3
 # Onionshare:
 #TODO: troubleshoot onionshare snap installation
 printf "Installing Onionshare\n" | tee /dev/fd/3
-# Github install ** TESTING ONLY **
-#curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python - | tee /dev/fd/3
-#git clone https://github.com/onionshare/onionshare.git | tee /dev/fd/3
-#cd onionshare/desktop
-#poetry install
-#poetry run ./scripts/get-tor-linux.py
-#curl -sSL https://go.dev/dl/go1.18.1.linux-amd64.tar.gz
-#sudo rm -rf /usr/local/go && tar -C /usr/local -xzf go1.18.1.linux-amd64.tar.gz
-#echo 'export PATH=$PATH:/usr/local/go/bin' | tee -a .bashrc .profile
 
 case ${PACKAGE} in
   flatpak)
     flatpak install flathub org.onionshare.OnionShare | echo_out
 	;;
   snap)
+    sudo snap install onionshare | echo_out
+    sudo snap connect onionshare:removable-media | echo_out
+	;;
+  *)
+    # Github install ** TESTING ONLY **
+    #curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python - | tee /dev/fd/3
+    #git clone https://github.com/onionshare/onionshare.git | tee /dev/fd/3
+    #cd onionshare/desktop
+    #poetry install
+    #poetry run ./scripts/get-tor-linux.py
+    #curl -sSL https://go.dev/dl/go1.18.1.linux-amd64.tar.gz
+    #sudo rm -rf /usr/local/go && tar -C /usr/local -xzf go1.18.1.linux-amd64.tar.gz
+    #echo 'export PATH=$PATH:/usr/local/go/bin' | tee -a .bashrc .profile
     sudo snap install onionshare | echo_out
     sudo snap connect onionshare:removable-media | echo_out
 	;;
