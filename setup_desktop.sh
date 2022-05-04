@@ -294,7 +294,7 @@ printf "Installing Onionshare\n" | tee /dev/fd/3
 
 case ${PACKAGE} in
   flatpak)
-    flatpak install flathub org.onionshare.OnionShare | echo_out
+    flatpak install flathub org.onionshare.OnionShare -y | echo_out
 	;;
   snap)
     sudo snap install onionshare | echo_out
