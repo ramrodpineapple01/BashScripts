@@ -1,7 +1,7 @@
 #!/bin/bash
 # Ubuntu VM desktop setup script
 # R. Dawson 2021
-# v2.4.0
+VERSION="2.4.1"
 
 ## Variables
 #TODO: ADAPTER: This works for a VM, but needs a better method
@@ -216,6 +216,7 @@ done
 shift "$(( OPTIND - 1 ))"
 
 # Start installation message
+echo_out "Script version ${VERSION}\n"
 printf "\nConfiguring Ubuntu Desktop\n" 1>&3
 printf "\nThis may take some time and the system may appear to be unresponsive\n" 1>&3
 printf "\nPlease be patient\n\n" 1>&3
