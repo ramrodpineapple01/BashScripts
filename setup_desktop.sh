@@ -1,7 +1,7 @@
 #!/bin/bash
 # Ubuntu VM desktop setup script
 # R. Dawson 2021
-VERSION="2.4.1"
+VERSION="2.5.0"
 
 ## Variables
 #TODO: ADAPTER: This works for a VM, but needs a better method
@@ -377,6 +377,16 @@ case ${VPN_INSTALL} in
     printf "\nUnrecognized VPN option ${VPN_INSTALL}.\n" 
 	;;
 esac
+
+# Create update.sh file
+printf "Creating update.sh\n" | tee /dev/fd/3
+cat << EOF > docker-compose.yml
+sudo apt update
+sudo apt-get -y dist-upgrade
+sudo apt-get -y autoremove
+sudo apt-get -y clean
+EOF
+printf "Complete\n\n" | tee /dev/fd/3
 
 # Cleanup
 printf "Cleaning up\n" | tee /dev/fd/3
