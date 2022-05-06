@@ -71,7 +71,7 @@ networks:
       name: internal
 EOF
 
-docker-compose up -d
+sudo docker-compose up -d
 
 # Install NginX Proxy Manager
 mkdir ~/dockers/nginxproxymanager
@@ -112,3 +112,5 @@ networks:
     external:
       name: internal
 EOF
+
+sudo docker-compose up -d
