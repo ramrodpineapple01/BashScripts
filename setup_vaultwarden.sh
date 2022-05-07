@@ -51,6 +51,9 @@ docker network create internal
 mkdir -p ~/dockers/vaultwarden/vw-data
 cd ~/dockers/vaultwarden
 
+# Generate secure admin token
+TOKEN="$(openssl rand -base64 48)"
+
 # Create docker-compose file
 cat << EOF > docker-compose.yml
 ---
@@ -64,6 +67,8 @@ services:
     ports:
       - 127.0.0.1:8088:80
       - 3012:3012
+    environment:
+      ADMIN_TOKEN=${TOKEN}
     restart: unless-stopped
 networks:
   default:
