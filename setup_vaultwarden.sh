@@ -57,10 +57,10 @@ TOKEN="$(openssl rand -base64 48)"
 # Create docker-compose file
 cat << EOF > docker-compose.yml
 ---
-version: "2.1"
+version: "3"
 services:
    vaultwarden:
-    image: vaultwarden/server
+    image: vaultwarden/server:latest
     container_name: vaultwarden
     volumes:
       - ./vw-data/:/data/
