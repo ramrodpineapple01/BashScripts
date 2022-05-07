@@ -70,7 +70,7 @@ services:
       - 127.0.0.1:8088:80
       - 3012:3012
     environment:
-      ADMIN_TOKEN=${TOKEN}
+      - ADMIN_TOKEN=${TOKEN}
     restart: unless-stopped
 networks:
   default:
