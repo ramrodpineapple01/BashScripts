@@ -54,7 +54,7 @@ mkdir -p ~/dockers/vaultwarden/vw-data
 cd ~/dockers/vaultwarden
 
 # Generate secure admin token
-TOKEN="$(openssl rand -base64 48)"
+TOKEN="$(openssl rand -base64 20)"
 
 # Create docker-compose file
 cat << EOF > docker-compose.yml
@@ -85,6 +85,10 @@ mkdir ~/dockers/nginxproxymanager
 cd ~/dockers/nginxproxymanager
 mkdir data letsencrypt
 
+# Generate passwords
+PW1=$(openssl rand -base64 24)
+PW2=$(openssl rand -base64 24)
+
 cat << EOF > docker-compose.yml
 version: '3'
 services:
@@ -99,7 +103,7 @@ services:
        DB_MYSQL_HOST: "db"
        DB_MYSQL_PORT: 3306
        DB_MYSQL_USER: "npm"
-       DB_MYSQL_PASSWORD: "f8j3u7ydFF@#GHR"
+       DB_MYSQL_PASSWORD: "${PW1}"
        DB_MYSQL_NAME: "npm"
      volumes:
        - ./data:/data
@@ -108,10 +112,10 @@ services:
      image: 'jc21/mariadb-aria:latest'
      restart: unless-stopped
      environment:
-       MYSQL_ROOT_PASSWORD: '9jf9834jkjdshf983#$F'
+       MYSQL_ROOT_PASSWORD: '${PW2}'
        MYSQL_DATABASE: 'npm'
        MYSQL_USER: 'npm'
-       MYSQL_PASSWORD: 'f8j3u7ydFF@#GHR'
+       MYSQL_PASSWORD: '${PW1}'
      volumes:
        - ./data/mysql:/var/lib/mysql
 networks:
