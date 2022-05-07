@@ -23,7 +23,9 @@ sudo apt-get -y install gnupg
 sudo apt-get -y installlsb-release
 
 # Add docker GPG key
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+if [[ ! -f /usr/share/keyrings/docker-archive-keyring.gpg ]]; then
+  curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+fi
 
 # Add docker stable repository
 echo \
@@ -45,7 +47,7 @@ sudo usermod -aG docker "${USER}"
 sudo apt-get -y install docker-compose
 
 # Create internal docker network
-docker network create internal
+sudo docker network create internal
 
 # Install vaultwarden
 mkdir -p ~/dockers/vaultwarden/vw-data
