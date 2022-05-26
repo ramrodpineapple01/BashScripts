@@ -386,7 +386,7 @@ sudo apt-get -y dist-upgrade
 sudo apt-get -y autoremove
 sudo apt-get -y clean
 EOF
-
+sudo chmod 744 ~/update.sh
 printf "Complete\n\n" | tee /dev/fd/3
 
 # Cleanup
