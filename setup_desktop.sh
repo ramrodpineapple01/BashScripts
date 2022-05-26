@@ -380,12 +380,13 @@ esac
 
 # Create update.sh file
 printf "Creating update.sh\n" | tee /dev/fd/3
-cat << EOF > docker-compose.yml
+cat << EOF > ~/update.sh
 sudo apt update
 sudo apt-get -y dist-upgrade
 sudo apt-get -y autoremove
 sudo apt-get -y clean
 EOF
+
 printf "Complete\n\n" | tee /dev/fd/3
 
 # Cleanup
