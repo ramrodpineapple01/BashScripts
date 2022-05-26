@@ -217,7 +217,7 @@ shift "$(( OPTIND - 1 ))"
 
 # Start installation message
 echo_out "Script version ${VERSION}\n"
-printf "\nConfiguring Ubuntu Desktop\n" 1>&3
+printf "\nConfiguring Kali Desktop\n" 1>&3
 printf "\nThis may take some time and the system may appear to be unresponsive\n" 1>&3
 printf "\nPlease be patient\n\n" 1>&3
 sudo :
@@ -310,6 +310,8 @@ case ${PACKAGE} in
     #curl -sSL https://go.dev/dl/go1.18.1.linux-amd64.tar.gz
     #sudo rm -rf /usr/local/go && tar -C /usr/local -xzf go1.18.1.linux-amd64.tar.gz
     #echo 'export PATH=$PATH:/usr/local/go/bin' | tee -a .bashrc .profile
+	
+	# Temporarily make this the default
     sudo snap install onionshare | echo_out
     sudo snap connect onionshare:removable-media | echo_out
 	;;
