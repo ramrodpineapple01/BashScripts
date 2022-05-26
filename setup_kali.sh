@@ -216,80 +216,176 @@ done
 shift "$(( OPTIND - 1 ))"
 
 # Start installation message
-printf "\nConfiguring Kali Desktop\n\n" 1>&3
-printf "\nThis may take some time and the system may appear to be unresponsive\n\n" 1>&3
+echo_out "Script version ${VERSION}\n"
+printf "\nConfiguring Ubuntu Desktop\n" 1>&3
+printf "\nThis may take some time and the system may appear to be unresponsive\n" 1>&3
 printf "\nPlease be patient\n\n" 1>&3
+sudo :
 
 # Add Repositories
 printf "Adding Repositories\n" | tee /dev/fd/3
-#sudo add-apt-repository -y ppa:unit193/encryption
-#sudo add-apt-repository -y ppa:yubico/stable
-#sudo add-apt-repository -y ppa:nextcloud-devs/client
+echo_out "1" n
+sudo add-apt-repository -y multiverse
+echo_out "\b2" n
+sudo add-apt-repository -y ppa:unit193/encryption
+echo_out "\b3" n
+sudo add-apt-repository -y ppa:yubico/stable
+echo_out "\b4"
+sudo add-apt-repository -y ppa:nextcloud-devs/client
 printf "Complete\n\n" | tee /dev/fd/3
 
 # Update the base OS
 printf "Updating base OS\n" | tee /dev/fd/3
-sudo apt-get update | tee /dev/fd/3
-sudo apt-get -y install software-properties-common | tee /dev/fd/3
-sudo apt-get -y dist-upgrade | tee /dev/fd/3
-sudo apt-get -y install python3 | tee /dev/fd/3
+sudo apt-get update | echo_out
+sudo apt-get -y install software-properties-common | echo_out
+sudo apt-get -y dist-upgrade | echo_out
+sudo apt-get -y install apt-transport-https | echo_out
 printf "Complete\n\n" | tee /dev/fd/3
-
-# Add toolsets
-sudo apt-get -y install kali-tools-information-gathering | tee /dev/fd/3
-sudo apt-get -y install kali-linux-large | tee /dev/fd/3
 
 # Install VirtualBox Guest Additions:
 printf "Installing VirtualBox Guest Additions\n" | tee /dev/fd/3
-sudo apt-get -y install virtualbox-guest-dkms | tee /dev/fd/3
-sudo apt-get -y install virtualbox-guest-x11 | tee /dev/fd/3
+sudo apt-get -y install dkms | echo_out
+sudo apt-get -y install gcc | echo_out
+sudo apt-get -y install make | echo_out
+sudo apt-get -y install perl | echo_out
+sudo apt-get -y install virtualbox-guest-additions-iso | echo_out
+sudo mount -o loop /usr/share/virtualbox/VBoxGuestAdditions.iso /media/ | echo_out
+/media/autorun.sh
 printf "Complete\n\n" | tee /dev/fd/3
 
 # Install Tor Browser:
 printf "Installing TOR browser bundle\n" | tee /dev/fd/3
 ## You may need this if you get a key error
 # gpg --homedir "$HOME/.local/share/torbrowser/gnupg_homedir" --refresh-keys --keyserver keyserver.ubuntu.com
-sudo apt-get -y install torbrowser-launcher | tee /dev/fd/3
+case ${PACKAGE} in
+  flatpak)
+    flatpak install flathub com.github.micahflee.torbrowser-launcher -y
+    ;;
+  snap)
+    ;;
+  *)
+    sudo apt-get -y install torbrowser-launcher | echo_out
+	;;
+esac
+
 printf "Complete\n\n" | tee /dev/fd/3
 
 # GTKHash:
 printf "Installing GTKHash\n" | tee /dev/fd/3
-sudo snap install gtkhash | tee /dev/fd/3
+sudo apt-get install -y gtkhash | echo_out
+#sudo snap install gtkhash | tee /dev/fd/3
 printf "Complete\n\n" | tee /dev/fd/3
 
 # Veracrypt:
 printf "Installing Veracrypt\n" | tee /dev/fd/3
-sudo apt-get -y install libwxgtk3.0-gtk3-0v5 | tee /dev/fd/3
-sudo apt-get -y install exfat-fuse exfat-utils | tee /dev/fd/3
-sudo apt-get -y install veracrypt | tee /dev/fd/3
+sudo apt-get -y install libwxgtk3.0-gtk3-0v5 | echo_out
+sudo apt-get -y install exfat-fuse exfat-utils | echo_out
+# Use either of these options but not both
+## Option 1
+sudo apt-get -y install veracrypt | echo_out
+## Option 2
+#sudo wget https://launchpad.net/veracrypt/trunk/1.24-update7/+download/veracrypt-console-1.24-Update7-Ubuntu-20.04-amd64.deb
+#sudo apt-get -y install ./veracrypt-console-1.24-Update7-Ubuntu-20.04-amd64.deb | tee /dev/fd/3
 printf "Complete\n\n" | tee /dev/fd/3
 
 # Onionshare:
+#TODO: troubleshoot onionshare snap installation
 printf "Installing Onionshare\n" | tee /dev/fd/3
-sudo snap install onionshare | tee /dev/fd/3
-sudo snap connect onionshare:removable-media | tee /dev/fd/3
+
+case ${PACKAGE} in
+  flatpak)
+    flatpak install flathub org.onionshare.OnionShare -y | echo_out
+	;;
+  snap)
+    sudo snap install onionshare | echo_out
+    sudo snap connect onionshare:removable-media | echo_out
+	;;
+  *)
+    # Github install ** TESTING ONLY **
+    #curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python - | tee /dev/fd/3
+    #git clone https://github.com/onionshare/onionshare.git | tee /dev/fd/3
+    #cd onionshare/desktop
+    #poetry install
+    #poetry run ./scripts/get-tor-linux.py
+    #curl -sSL https://go.dev/dl/go1.18.1.linux-amd64.tar.gz
+    #sudo rm -rf /usr/local/go && tar -C /usr/local -xzf go1.18.1.linux-amd64.tar.gz
+    #echo 'export PATH=$PATH:/usr/local/go/bin' | tee -a .bashrc .profile
+    sudo snap install onionshare | echo_out
+    sudo snap connect onionshare:removable-media | echo_out
+	;;
+esac
 printf "Complete\n\n" | tee /dev/fd/3
 
 # KeepassXC:
 printf "Installing KeePassXC\n" | tee /dev/fd/3
-sudo snap install keepassxc | tee /dev/fd/3
-sudo snap connect keepassxc:raw-usb | tee /dev/fd/3
-sudo snap connect keepassxc:removable-media | tee /dev/fd/3
+#sudo apt-get -y install keepassxc | echo_out
+#TODO: Confirm this works with 22.04
+sudo snap install keepassxc | echo_out
+sudo snap connect keepassxc:raw-usb | echo_out
+sudo snap connect keepassxc:removable-media | echo_out
 printf "Complete\n\n" | tee /dev/fd/3
 
 #Yubikey:
 printf "Installing Yubikey\n" | tee /dev/fd/3
-sudo apt-get -y install yubikey-manager | tee /dev/fd/3
-sudo apt-get -y install libykpers-1-1 | tee /dev/fd/3
-##For yubikey authorization
-sudo apt-get -y install libpam-u2f | tee /dev/fd/3
-sudo wget https://raw.githubusercontent.com/Yubico/libu2f-host/master/70-u2f.rules /etc/udev/rules.d/70-u2f.rules | tee /dev/fd/3
-sudo mkdir -p ~/.config/Yubico | tee /dev/fd/3
+sudo apt-get -y install yubikey-manager | echo_out
+sudo apt-get -y install libykpers-1-1 | echo_out
+
+#For yubikey authorization
+sudo apt-get -y install libpam-u2f | echo_out
+sudo wget https://raw.githubusercontent.com/Yubico/libu2f-host/master/70-u2f.rules -O /etc/udev/rules.d/70-u2f.rules | echo_out
+#sudo mv 70-u2f.rules /etc/udev/rules.d/70-u2f.rules | tee /dev/fd/3
+sudo mkdir -p ~/.config/Yubico | echo_out
 printf "Complete\n\n" | tee /dev/fd/3
 
-# Nextcloud:
-printf "Installing Nextcloud Client\n" | tee /dev/fd/3
-sudo apt-get -y install nextcloud-client | tee /dev/fd/3
+#Nextcloud:
+printf "Installing Nextcloud Client\n\nThis can take a while\n" | tee /dev/fd/3
+sudo apt-get -y install nextcloud-client | echo_out
+printf "Complete\n\n" | tee /dev/fd/3
+
+# VPN Clients
+case ${VPN_INSTALL} in
+  false)
+    :
+	;;
+  all)
+    install_airvpn
+	install_ivpn
+    install_mullvad
+    install_openvpn
+	install_nordvpn
+	install_protonvpn
+    ;;
+  airvpn)
+    install_airvpn
+	;;
+  ivpn)
+    install_ivpn
+	;;
+  mullvad)
+    install_mullvad
+	;;
+  nordvpn)
+    install_nordvpn
+	;;
+  openvpn)
+    install_openvpn
+	;;
+  protonvpn)
+    install_protonvpn
+	;;
+  *)
+    printf "\nUnrecognized VPN option ${VPN_INSTALL}.\n" 
+	;;
+esac
+
+# Create update.sh file
+printf "Creating update.sh\n" | tee /dev/fd/3
+cat << EOF > docker-compose.yml
+sudo apt update
+sudo apt-get -y dist-upgrade
+sudo apt-get -y autoremove
+sudo apt-get -y clean
+EOF
 printf "Complete\n\n" | tee /dev/fd/3
 
 # Load OSINT tools scripts
@@ -305,8 +401,9 @@ printf "Complete\n\n" | tee /dev/fd/3
 
 # Cleanup
 printf "Cleaning up\n" | tee /dev/fd/3
-sudo apt-get -y autoremove | tee /dev/fd/3
-sudo apt-get -y clean | tee /dev/fd/3
+sudo apt-get -y autoremove --purge | echo_out
+sudo apt-get -y clean | echo_out
+sudo rm 70-u2f.rules | echo_out # May not exist
 printf "Complete\n\n" | tee /dev/fd/3
 
 printf "\n\tPress [Enter] to reboot\n" 1>&3

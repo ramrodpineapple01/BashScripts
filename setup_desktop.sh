@@ -390,7 +390,7 @@ printf "Complete\n\n" | tee /dev/fd/3
 
 # Cleanup
 printf "Cleaning up\n" | tee /dev/fd/3
-sudo apt-get -y autoremove | echo_out
+sudo apt-get -y autoremove --purge | echo_out
 sudo apt-get -y clean | echo_out
 sudo rm 70-u2f.rules | echo_out # May not exist
 printf "Complete\n\n" | tee /dev/fd/3
