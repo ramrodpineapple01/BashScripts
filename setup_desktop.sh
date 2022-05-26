@@ -383,7 +383,7 @@ printf "Creating update.sh\n" | tee /dev/fd/3
 cat << EOF > ~/update.sh
 sudo apt update
 sudo apt-get -y dist-upgrade
-sudo apt-get -y autoremove
+sudo apt-get -y autoremove --purge
 sudo apt-get -y clean
 EOF
 sudo chmod 744 ~/update.sh
