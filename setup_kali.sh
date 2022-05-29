@@ -173,9 +173,6 @@ usage() {
 # Create a log file with current date and time
 touch ${LOG_FILE}
 
-# Redirect outputs
-exec 3>&1 1>>${LOG_FILE} 2>&1
-
 # Provide usage statement if no parameters
 while getopts cdfhp:v OPTION; do
   case ${OPTION} in
@@ -211,6 +208,9 @@ while getopts cdfhp:v OPTION; do
       ;;
   esac
 done
+
+# Redirect outputs
+exec 3>&1 1>>${LOG_FILE} 2>&1
 
 # Clear the options from the arguments
 shift "$(( OPTIND - 1 ))"
