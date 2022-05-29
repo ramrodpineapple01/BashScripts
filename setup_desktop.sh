@@ -177,7 +177,7 @@ touch ${LOG_FILE}
 exec 3>&1 1>>${LOG_FILE} 2>&1
 
 # Provide usage statement if no parameters
-while getopts cdfp:v OPTION; do
+while getopts cdfhp:v OPTION; do
   case ${OPTION} in
 	c)
 	# Check for internet connection

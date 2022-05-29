@@ -177,7 +177,7 @@ touch ${LOG_FILE}
 exec 3>&1 1>>${LOG_FILE} 2>&1
 
 # Provide usage statement if no parameters
-while getopts cdfp:v OPTION; do
+while getopts cdfhp:v OPTION; do
   case ${OPTION} in
 	c)
 	# Check for internet connection
@@ -393,8 +393,8 @@ printf "Complete\n\n" | tee /dev/fd/3
 
 # Load OSINT tools scripts
 printf "Installing OSINT tools and scripts\n" | tee /dev/fd/3
-cd ~/Documents 
-git clone https://github.com/rdbh/osint.git | tee /dev/fd/3
+cd "${HOME}"
+git clone https://github.com/rdbh/osint.git | echo_out
 cd osint
 sudo chmod 755 *.sh
 cd install
