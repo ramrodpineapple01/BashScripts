@@ -394,14 +394,17 @@ printf "Complete\n\n" | tee /dev/fd/3
 # Load OSINT tools scripts
 printf "Installing OSINT tools and scripts\n" | tee /dev/fd/3
 cd "${HOME}"
-if [[ "${BRANH}" == "dev" ]]; then
+if [[ "${BRANCH}" == "dev" ]]; then
   git clone https://github.com/radawson/osint.git | echo_out
+  cd osint
+  sudo chmod 755 *.sh
+  ./install.sh
 else 
   git clone https://github.com/rdbh/osint.git | echo_out
 fi
 cd osint
 sudo chmod 755 *.sh
-./install.sh
+cd install
 sudo chmod 755 *.sh
 bash jupyter-install.sh
 printf "Complete\n\n" | tee /dev/fd/3
