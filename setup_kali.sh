@@ -397,8 +397,8 @@ cd "${HOME}"
 if [[ "${BRANCH}" == "dev" ]]; then
   git clone https://github.com/radawson/osint.git | echo_out
   cd osint
-  sudo chmod 755 *.sh
-  ./install.sh
+  sudo chmod 755 install.sh
+  ./install.sh -d
 else 
   git clone https://github.com/rdbh/osint.git | echo_out
 fi
