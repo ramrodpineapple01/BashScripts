@@ -127,6 +127,7 @@ install_mullvad () {
   wget --content-disposition https://mullvad.net/download/app/deb/latest | echo_out
   MV_PACKAGE=$(cat ls | grep Mullvad)
   sudo apt-get -y install ./"${MV_PACKAGE}" | echo_out
+  rm "${MV_PACKAGE}"
   printf "Mullvad Installation VPN Complete.\n\n" | tee /dev/fd/3
 }
 
@@ -152,6 +153,7 @@ install_protonvpn () {
   sudo apt install protonvpn-stable-release_1.0.1-1_all.deb | echo_out
   sudo apt update | echo_out
   sudo apt-get -y install protonvpn | echo_out
+  rm protonvpn-stable-release_1.0.1-1_all.deb
   printf "ProtonVPN Installation Complete.\n\n" | tee /dev/fd/3
 }
 
@@ -411,12 +413,12 @@ if [[ "${BRANCH}" == "dev" ]]; then
   ./install.sh -d
 else 
   git clone https://github.com/rdbh/osint.git | echo_out
+  cd osint
+  sudo chmod 755 *.sh
+  cd install
+  sudo chmod 755 *.sh
+  bash jupyter-install.sh
 fi
-cd osint
-sudo chmod 755 *.sh
-cd install
-sudo chmod 755 *.sh
-bash jupyter-install.sh
 printf "Complete\n\n" | tee /dev/fd/3
 
 # Cleanup
