@@ -71,7 +71,6 @@ check_internet() {
 check_root() {
   # Check to ensure script is not run as root
   if [[ "${UID}" -eq 0 ]]; then
-    UNAME=$(id -un)
     printf "\nThis script should not be run as root.\n\n" >&2
     usage
   fi
@@ -242,15 +241,26 @@ sudo apt-get -y dist-upgrade | echo_out
 sudo apt-get -y install apt-transport-https | echo_out
 printf "Complete\n\n" | tee /dev/fd/3
 
-# Install VirtualBox Guest Additions:
-printf "Installing VirtualBox Guest Additions\n" | tee /dev/fd/3
-sudo apt-get -y install dkms | echo_out
-sudo apt-get -y install gcc | echo_out
-sudo apt-get -y install make | echo_out
-sudo apt-get -y install perl | echo_out
-sudo apt-get -y install virtualbox-guest-additions-iso | echo_out
-sudo mount -o loop /usr/share/virtualbox/VBoxGuestAdditions.iso /media/ | echo_out
-/media/autorun.sh
+# Install VM management software:
+SYSTEM_HW="$(sudo dmidecode -s system-product-name)"
+case ${SYSTEM_HW} in 
+  Virtualbox)
+    printf "Installing VirtualBox Guest Additions\n" | tee /dev/fd/3
+	sudo apt-get -y install dkms | echo_out
+	sudo apt-get -y install gcc | echo_out
+	sudo apt-get -y install make | echo_out
+	sudo apt-get -y install perl | echo_out
+	sudo apt-get -y install virtualbox-guest-additions-iso | echo_out
+	sudo mount -o loop /usr/share/virtualbox/VBoxGuestAdditions.iso /media/ | echo_out
+	/media/autorun.sh
+	;;
+  VMware*)
+    sudo apt install -y --reinstall open-vm-tools-desktop fuse3
+    ;;
+  *)
+    echo_out "No virtualization recognized,"
+	;;
+esac
 printf "Complete\n\n" | tee /dev/fd/3
 
 # Install Tor Browser:
