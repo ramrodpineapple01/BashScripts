@@ -362,7 +362,6 @@ case ${PACKAGE} in
 	;;
   *)
     sudo snap install onlyoffice-desktopeditors | echo_out
-    sudo snap connect onionshare:removable-media | echo_out
 	;;
 esac
 printf "Complete\n\n" | tee /dev/fd/3
