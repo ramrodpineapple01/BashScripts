@@ -105,6 +105,22 @@ install_airvpn () {
   printf "AirVPN Installation Complete.\n\n" | tee /dev/fd/3
 }
 
+install_browsers () {
+  printf "Installing Additional Browsers.\n" | tee /dev/fd/3
+  # Brave
+  echo_out "Brave Browser"
+  sudo curl -fsSLo /usr/share/keyrings/brave-browser-archive-keyring.gpg https://brave-browser-apt-release.s3.brave.com/brave-browser-archive-keyring.gpg | echo_out
+  echo "deb [signed-by=/usr/share/keyrings/brave-browser-archive-keyring.gpg arch=amd64] https://brave-browser-apt-release.s3.brave.com/ stable main"|sudo tee /etc/apt/sources.list.d/brave-browser-release.list
+  sudo apt update
+  sudo apt-get -y install brave-browser
+
+  # Chrome
+  wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+  sudo apt-get -y install google-chrome-stable_current_amd64.deb
+
+  printf "Browser Installation Complete.\n\n" | tee /dev/fd/3
+}
+
 install_flatpak () {
   printf "Installing Flatpak.\n" | tee /dev/fd/3
   sudo apt-get -y install flatpak | echo_out
@@ -157,10 +173,11 @@ install_protonvpn () {
 }
 
 usage() {
-  echo "Usage: ${0} [-cfh] [-p VPN_name] " >&2
+  echo "Usage: ${0} [-bcfh] [-p VPN_name] " >&2
   echo "Sets up Ubuntu Desktop with useful apps."
   #echo "Do not run as root."
   echo
+  echo "-b 			Install multiple browsers."
   echo "-c 			Check internet connection before starting."
   echo "-f			Install Flatpak."
   echo "-h 			Help (this list)."
@@ -177,8 +194,12 @@ touch ${LOG_FILE}
 exec 3>&1 1>>${LOG_FILE} 2>&1
 
 # Provide usage statement if no parameters
-while getopts cdfhp:v OPTION; do
+while getopts bcdfhp:v OPTION; do
   case ${OPTION} in
+  b)
+    # Install browser packages
+    install_browsers
+    ;;
 	c)
 	# Check for internet connection
 	  check_internet "${CHECK_IP}"
@@ -270,7 +291,7 @@ printf "Installing TOR browser bundle\n" | tee /dev/fd/3
 # gpg --homedir "$HOME/.local/share/torbrowser/gnupg_homedir" --refresh-keys --keyserver keyserver.ubuntu.com
 case ${PACKAGE} in
   flatpak)
-    flatpak install flathub com.github.micahflee.torbrowser-launcher -y
+    flatpak install flathub com.github.micahflee.torbrowser-launcher -y | echo_out
     ;;
   snap)
     ;;
