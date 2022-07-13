@@ -1,7 +1,7 @@
 #!/bin/bash
 # Ubuntu VM desktop setup script
 # R. Dawson 2021
-VERSION="2.5.0"
+VERSION="2.6.0"
 
 ## Variables
 #TODO: ADAPTER: This works for a VM, but needs a better method
@@ -348,9 +348,23 @@ sudo wget https://raw.githubusercontent.com/Yubico/libu2f-host/master/70-u2f.rul
 sudo mkdir -p ~/.config/Yubico | echo_out
 printf "Complete\n\n" | tee /dev/fd/3
 
-#Nextcloud:
+# Nextcloud:
 printf "Installing Nextcloud Client\n\nThis can take a while\n" | tee /dev/fd/3
 sudo apt-get -y install nextcloud-client | echo_out
+printf "Complete\n\n" | tee /dev/fd/3
+
+# OnlyOffice:
+printf "Installing OnlyOffice\n" | tee /dev/fd/3
+
+case ${PACKAGE} in
+  flatpak)
+    flatpak install flathub org.onlyoffice.desktopeditors -y | echo_out
+	;;
+  *)
+    sudo snap install onlyoffice-desktopeditors | echo_out
+    sudo snap connect onionshare:removable-media | echo_out
+	;;
+esac
 printf "Complete\n\n" | tee /dev/fd/3
 
 # VPN Clients
