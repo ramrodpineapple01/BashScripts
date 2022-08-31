@@ -1,9 +1,14 @@
 #!/bin/bash
 # Kali VM base setup script
 # R. Dawson 2022
-# v2.0.0
+VERSION="2.1.0"
 
 ## Variables
+# Configuration Variables
+BIN_PATH=${HOME}/Downloads/Programs
+DOC_PATH=${HOME}/Documents/osint
+JUP_PATH=/usr/share/jupyter
+
 #TODO: ADAPTER: This works for a VM, but needs a better method
 ADAPTER1=$(ls /sys/class/net | grep e) 	# 1st Ethernet adapter on VM
 BRANCH="main"							# Default to main branch
@@ -78,7 +83,7 @@ check_root() {
 
 echo_out() {
   # Get input from stdin OR $1
-  local MESSAGE=${1:-$(</dev/stdin)}
+  local MESSAGE=${1:-$(</dev/stdin)} | tr -d '\r'
   
   # Check to see if we need a \n
   if [[ "${2}" == 'n' ]]; then
@@ -157,6 +162,17 @@ install_protonvpn () {
   printf "ProtonVPN Installation Complete.\n\n" | tee /dev/fd/3
 }
 
+pause_for () {
+  COUNT=${2}
+  printf "${1}" | tee /dev/fd/3
+  while [ ${COUNT} -gt 0 ]; do 
+    printf "${COUNT}" | tee /dev/fd/3
+	for (( i=0; i<=${#COUNT}; i++ )); do
+	  printf "\b" | tee /dev/fd/3
+	done
+  done
+}
+
 usage() {
   echo "Usage: ${0} [-cfh] [-p VPN_name] " >&2
   echo "Sets up Kali with useful OSINT apps."
@@ -218,10 +234,40 @@ shift "$(( OPTIND - 1 ))"
 
 # Start installation message
 echo_out "Script version ${VERSION}\n"
-printf "\nConfiguring Kali Desktop\n" 1>&3
+# Get OS distribution
+if [[ "${1}" == "Kali" ]]; then 
+  OS_NAME="Kali"
+elif [[ "${1}" == "Ubuntu" ]]; then
+  OS_NAME="Ubuntu"
+else
+  OS_NAME=$(lsb_release -a | grep '^Distributor' | cut -c 17-)
+fi
+
+printf "Installing for ${OS_NAME}" | tee /dev/fd/3 
+printf "Ctrl-C to abort" | tee /dev/fd/3
+pause_for "Ctrl-C to abort" 9
 printf "\nThis may take some time and the system may appear to be unresponsive\n" 1>&3
 printf "\nPlease be patient\n\n" 1>&3
 sudo :
+
+# Create config file
+touch ~/osint.config
+echo DOC_PATH=${DOC_PATH} > ~/osint.config
+echo BIN_PATH=${BIN_PATH} >> ~/osint.config
+echo JUP_PATH=${JUP_PATH} >> ~/osint.config
+
+# Create program paths
+mkdir -p "${BIN_PATH}"
+
+
+# Update the base OS
+printf "Updating base OS\n" | tee /dev/fd/3
+sudo apt-get update | echo_out
+sudo apt-get -y install software-properties-common | echo_out
+sudo apt-get -y dist-upgrade | echo_out
+sudo apt-get -y install apt-transport-https | echo_out
+sudo apt-get -y install snapd
+printf "Complete\n\n" | tee /dev/fd/3
 
 # Add Repositories
 printf "Adding Repositories\n" | tee /dev/fd/3
@@ -235,13 +281,6 @@ echo_out "\b4"
 sudo add-apt-repository -y ppa:nextcloud-devs/client
 printf "Complete\n\n" | tee /dev/fd/3
 
-# Update the base OS
-printf "Updating base OS\n" | tee /dev/fd/3
-sudo apt-get update | echo_out
-sudo apt-get -y install software-properties-common | echo_out
-sudo apt-get -y dist-upgrade | echo_out
-sudo apt-get -y install apt-transport-https | echo_out
-printf "Complete\n\n" | tee /dev/fd/3
 
 # Install VM management software:
 SYSTEM_HW="$(sudo dmidecode -s system-product-name)"
@@ -415,7 +454,7 @@ else
   git clone https://github.com/rdbh/osint.git | echo_out
   cd osint
   sudo chmod 755 *.sh
-  cd install
+  cd install 
   sudo chmod 755 *.sh
   bash jupyter-install.sh
 fi
