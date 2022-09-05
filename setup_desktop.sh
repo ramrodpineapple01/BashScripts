@@ -190,16 +190,13 @@ usage() {
 # Create a log file with current date and time
 touch ${LOG_FILE}
 
-# Redirect outputs
-exec 3>&1 1>>${LOG_FILE} 2>&1
-
 # Provide usage statement if no parameters
 while getopts bcdfhp:v OPTION; do
   case ${OPTION} in
   b)
     # Install browser packages
-    install_browsers
-    ;;
+      install_browsers
+      ;;
 	c)
 	# Check for internet connection
 	  check_internet "${CHECK_IP}"
@@ -235,6 +232,9 @@ done
 
 # Clear the options from the arguments
 shift "$(( OPTIND - 1 ))"
+
+# Redirect outputs
+exec 3>&1 1>>${LOG_FILE} 2>&1
 
 # Start installation message
 echo_out "Script version ${VERSION}\n"

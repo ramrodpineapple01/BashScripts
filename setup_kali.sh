@@ -167,7 +167,7 @@ pause_for () {
   printf "${1}" | tee /dev/fd/3
   while [ ${COUNT} -gt 0 ]; do 
     printf "${COUNT}" | tee /dev/fd/3
-	for (( i=0; i<=${#COUNT}; i++ )); do
+	for (( i=0; i<=${COUNT}; i++ )); do
 	  printf "\b" | tee /dev/fd/3
 	done
   done
