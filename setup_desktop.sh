@@ -181,7 +181,7 @@ usage() {
   echo "-c 			Check internet connection before starting."
   echo "-f			Install Flatpak."
   echo "-h 			Help (this list)."
-  echo "-p VPN_NAME	Install VPN client(s) or 'all'."
+  echo "-p VPN_NAME	  Install VPN client(s) or 'all'."
   echo "-v 			Verbose mode."
   exit 1
 }
@@ -268,20 +268,20 @@ SYSTEM_HW="$(sudo dmidecode -s system-product-name)"
 case ${SYSTEM_HW} in 
   Virtualbox)
     printf "Installing VirtualBox Guest Additions\n" | tee /dev/fd/3
-	sudo apt-get -y install dkms | echo_out
-	sudo apt-get -y install gcc | echo_out
-	sudo apt-get -y install make | echo_out
-	sudo apt-get -y install perl | echo_out
-	sudo apt-get -y install virtualbox-guest-additions-iso | echo_out
-	sudo mount -o loop /usr/share/virtualbox/VBoxGuestAdditions.iso /media/ | echo_out
-	/media/autorun.sh
-	;;
+	  sudo apt-get -y install dkms | echo_out
+	  sudo apt-get -y install gcc | echo_out
+	  sudo apt-get -y install make | echo_out
+	  sudo apt-get -y install perl | echo_out
+	  sudo apt-get -y install virtualbox-guest-additions-iso | echo_out
+	  sudo mount -o loop /usr/share/virtualbox/VBoxGuestAdditions.iso /media/ | echo_out
+	  /media/autorun.sh
+	  ;;
   VMware*)
     sudo apt install -y --reinstall open-vm-tools-desktop fuse3
     ;;
   *)
     echo_out "No virtualization recognized,"
-	;;
+	  ;;
 esac
 printf "Complete\n\n" | tee /dev/fd/3
 
@@ -327,11 +327,11 @@ printf "Installing Onionshare\n" | tee /dev/fd/3
 case ${PACKAGE} in
   flatpak)
     flatpak install flathub org.onionshare.OnionShare -y | echo_out
-	;;
+	  ;;
   snap)
     sudo snap install onionshare | echo_out
     sudo snap connect onionshare:removable-media | echo_out
-	;;
+	  ;;
   *)
     # Github install ** TESTING ONLY **
     #curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python - | tee /dev/fd/3
