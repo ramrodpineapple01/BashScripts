@@ -346,6 +346,7 @@ case ${PACKAGE} in
     wget https://www.torproject.org/dist/torbrowser/11.5.2/tor-browser-linux64-11.5.2_en-US.tar.xz
 	tar -xvf tor-browser-linux64-11.5.2_en-US.tar.xz
 	rm tor-browser-linux64-11.5.2_en-US.tar.xz
+	ln ./tor-browser_en-US/start-tor-browser.desktop /usr/share/applications/
 	;;
 esac
 
