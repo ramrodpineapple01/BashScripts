@@ -338,15 +338,15 @@ case ${PACKAGE} in
     flatpak install flathub com.github.micahflee.torbrowser-launcher -y | echo_out
     ;;
   snap)
-    sudo snap install tor-mkg20001
+    sudo snap install tor-mkg20001 | echo_out
     ;;
   *)
-    mkdir ~/Desktop
+    mkdir ~/Desktop | echo_out
 	cd ~/Desktop
-    wget https://www.torproject.org/dist/torbrowser/11.5.2/tor-browser-linux64-11.5.2_en-US.tar.xz
-	tar -xvf tor-browser-linux64-11.5.2_en-US.tar.xz
-	rm tor-browser-linux64-11.5.2_en-US.tar.xz
-	ln ./tor-browser_en-US/start-tor-browser.desktop /usr/share/applications/
+    wget https://www.torproject.org/dist/torbrowser/11.5.2/tor-browser-linux64-11.5.2_en-US.tar.xz | echo_out
+	tar -xvf tor-browser-linux64-11.5.2_en-US.tar.xz | echo_out
+	rm tor-browser-linux64-11.5.2_en-US.tar.xz | echo_out
+	ln ./tor-browser_en-US/start-tor-browser.desktop /usr/share/applications/ | echo_out
 	;;
 esac
 
