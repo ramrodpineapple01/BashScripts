@@ -10,7 +10,7 @@ BRANCH="main"							# Default to main branch
 CHECK_IP="8.8.8.8"						# Test ping to google DNS
 DATE_VAR=$(date +'%y%m%d-%H%M')			# Today's Date and time
 LOG_FILE="${DATE_VAR}_install.log"  	# Log File name
-PACKAGE="snap" 							# Install snaps by default
+PACKAGE="apt" 							# Install snaps by default
 VPN_INSTALL="false"						# Do not install VPN clients by default
 WIFI_TOOLS="false"						# Do not install wifi tools by default
 
@@ -204,6 +204,7 @@ usage() {
   echo "-f			Install Flatpak."
   echo "-h 			Help (this list)."
   echo "-p VPN_NAME	  Install VPN client(s) or 'all'."
+  echo "-s3			Install Snaps"
   echo "-v 			Verbose mode."
   echo "-w			WiFi tools (kismet)."
   exit 1
@@ -219,7 +220,7 @@ if [[ $(which git) == "" ]]; then
 fi
 
 # Provide usage statement if no parameters
-while getopts bcdfhp:vw OPTION; do
+while getopts bcdfhp:svw OPTION; do
   case ${OPTION} in
   b)
     # Install browser packages
@@ -245,6 +246,11 @@ while getopts bcdfhp:vw OPTION; do
 	p)
 	  VPN_INSTALL="${OPTARG}"
 	  ;;
+	s)
+	# Flag for snap installation
+	  PACKAGE="snap"
+	  echo_out "Snap use set to true"
+	  ;; 
 	v)
       # Verbose is first so any other elements will echo as well
       VERBOSE='true'
@@ -335,7 +341,11 @@ case ${PACKAGE} in
     sudo snap install tor-mkg20001
     ;;
   *)
-    sudo apt-get -y install torbrowser-launcher | echo_out
+    mkdir ~/Desktop
+	cd ~/Desktop
+    wget https://www.torproject.org/dist/torbrowser/11.5.2/tor-browser-linux64-11.5.2_en-US.tar.xz
+	tar -xvf tor-browser-linux64-11.5.2_en-US.tar.xz
+	rm tor-browser-linux64-11.5.2_en-US.tar.xz
 	;;
 esac
 
