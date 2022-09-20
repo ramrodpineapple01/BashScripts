@@ -129,14 +129,6 @@ install_flatpak () {
   printf "Flatpak Installation Complete.\n\n" | tee /dev/fd/3
 }
 
-install_kismet() {
-  wget -O - https://www.kismetwireless.net/repos/kismet-release.gpg.key | sudo tee /etc/apt/trusted.gpg.d/kismet.asc
-  echo 'deb https://www.kismetwireless.net/repos/apt/release/jammy jammy main' | sudo tee /etc/apt/sources.list.d/kismet.list
-  sudo apt update
-  sudo apt-get -y install kismet
-
-}
-
 install_ivpn() {
   printf "Installing IVPN client.\n" | tee /dev/fd/3
   wget -O - https://repo.ivpn.net/stable/ubuntu/generic.gpg | gpg --dearmor > ~/ivpn-archive-keyring.gpg | echo_out
@@ -180,6 +172,17 @@ install_protonvpn () {
   printf "ProtonVPN Installation Complete.\n\n" | tee /dev/fd/3
 }
 
+install_wifi_tools() {
+  wget -O - https://www.kismetwireless.net/repos/kismet-release.gpg.key | sudo tee /etc/apt/trusted.gpg.d/kismet.asc
+  echo 'deb https://www.kismetwireless.net/repos/apt/release/jammy jammy main' | sudo tee /etc/apt/sources.list.d/kismet.list
+  sudo apt update
+  sudo apt-get -y install kismet
+  git clone https://github.com/kismetwireless/python-kismet-rest.git
+  cd python-kismet-rest
+  sudo python3 setup.py install
+
+}
+
 usage() {
   echo "Usage: ${0} [-bcfh] [-p VPN_name] " >&2
   echo "Sets up Ubuntu Desktop with useful apps."
@@ -198,6 +201,11 @@ usage() {
 ## MAIN
 # Create a log file with current date and time
 touch ${LOG_FILE}
+
+# Install git
+if [[ $(which git) == "" ]]; then
+  sudo apt-get -y install git
+fi
 
 # Provide usage statement if no parameters
 while getopts bcdfhp:vw OPTION; do
@@ -233,7 +241,8 @@ while getopts bcdfhp:vw OPTION; do
       echo_out "Verbose mode on."
       ;;
 	w)
-	  install_kismet
+	  install_wifi_tools
+	  echo_out "WiFi tools installed"
 	  ;;
     ?)
       echo "invalid option" >&2
