@@ -1,7 +1,7 @@
 #!/bin/bash
 # Ubuntu VM desktop setup script
-# R. Dawson 2021
-VERSION="2.6.0"
+# R. Dawson 2021-2022
+VERSION="2.7.0"
 
 ## Variables
 #TODO: ADAPTER: This works for a VM, but needs a better method
@@ -179,6 +179,18 @@ install_wifi_tools() {
   sudo apt update
   sudo apt-get -y install kismet
   pip install kismet_rest
+  
+  # Kismon installation
+  #sudo apt-get -y install python3-gi 
+  #sudo apt-get -y install gir1.2-gtk-3.0
+  #sudo apt-get -y install gir1.2-gdkpixbuf-2.0 
+  #sudo apt-get -y install python3-cairo 
+  sudo apt-get -y install python3-simplejson
+  sudo apt-get -y install gir1.2-osmgpsmap-1.0
+  cd ~
+  git clone https://github.com/radawson/kismon.git kismon
+  cd kismon
+  sudo make install
 
 }
 
