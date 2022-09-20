@@ -12,6 +12,7 @@ DATE_VAR=$(date +'%y%m%d-%H%M')			# Today's Date and time
 LOG_FILE="${DATE_VAR}_install.log"  	# Log File name
 PACKAGE="snap" 							# Install snaps by default
 VPN_INSTALL="false"						# Do not install VPN clients by default
+WIFI_TOOLS="false"						# Do not install wifi tools by default
 
 ## Functions
 check_internet() {
@@ -173,13 +174,11 @@ install_protonvpn () {
 }
 
 install_wifi_tools() {
-  wget -O - https://www.kismetwireless.net/repos/kismet-release.gpg.key | sudo tee /etc/apt/trusted.gpg.d/kismet.asc
-  echo 'deb https://www.kismetwireless.net/repos/apt/release/jammy jammy main' | sudo tee /etc/apt/sources.list.d/kismet.list
+  wget -O - https://www.kismetwireless.net/repos/kismet-release.gpg.key | sudo tee /etc/apt/trusted.gpg.d/kismet.asc | echo_out
+  echo 'deb https://www.kismetwireless.net/repos/apt/release/jammy jammy main' | sudo tee /etc/apt/sources.list.d/kismet.list | echo_out
   sudo apt update
   sudo apt-get -y install kismet
-  git clone https://github.com/kismetwireless/python-kismet-rest.git
-  cd python-kismet-rest
-  sudo python3 setup.py install
+  pip install kismet_rest
 
 }
 
@@ -227,7 +226,6 @@ while getopts bcdfhp:vw OPTION; do
 	# Flag for flatpak installation
 	  PACKAGE="flatpak"
 	  echo_out "Flatpak use set to true"
-	  install_flatpak
 	  ;;  
 	h)
 	  usage
@@ -241,8 +239,8 @@ while getopts bcdfhp:vw OPTION; do
       echo_out "Verbose mode on."
       ;;
 	w)
-	  install_wifi_tools
-	  echo_out "WiFi tools installed"
+	  WIFI_TOOLS='true'
+	  echo_out "WiFi tools will be installed"
 	  ;;
     ?)
       echo "invalid option" >&2
@@ -289,21 +287,27 @@ SYSTEM_HW="$(sudo dmidecode -s system-product-name)"
 case ${SYSTEM_HW} in 
   Virtualbox)
     printf "Installing VirtualBox Guest Additions\n" | tee /dev/fd/3
-	  sudo apt-get -y install dkms | echo_out
-	  sudo apt-get -y install gcc | echo_out
-	  sudo apt-get -y install make | echo_out
-	  sudo apt-get -y install perl | echo_out
-	  sudo apt-get -y install virtualbox-guest-additions-iso | echo_out
-	  sudo mount -o loop /usr/share/virtualbox/VBoxGuestAdditions.iso /media/ | echo_out
-	  /media/autorun.sh
-	  ;;
+	sudo apt-get -y install dkms | echo_out
+	sudo apt-get -y install gcc | echo_out
+	sudo apt-get -y install make | echo_out
+	sudo apt-get -y install perl | echo_out
+	sudo apt-get -y install virtualbox-guest-additions-iso | echo_out
+	sudo mount -o loop /usr/share/virtualbox/VBoxGuestAdditions.iso /media/ | echo_out
+	/media/autorun.sh
+	;;
   VMware*)
+    printf "Installing VMWare Tools\n" | tee /dev/fd/3
     sudo apt install -y --reinstall open-vm-tools-desktop fuse3
     ;;
   *)
     echo_out "No virtualization recognized,"
-	  ;;
+	;;
 esac
+printf "Complete\n\n" | tee /dev/fd/3
+
+# Install python PIP
+printf "Installing python PIP\n" | tee /dev/fd/3
+sudo apt-get -y install python3-pip | echo_out
 printf "Complete\n\n" | tee /dev/fd/3
 
 # Install Tor Browser:
@@ -312,9 +316,11 @@ printf "Installing TOR browser bundle\n" | tee /dev/fd/3
 # gpg --homedir "$HOME/.local/share/torbrowser/gnupg_homedir" --refresh-keys --keyserver keyserver.ubuntu.com
 case ${PACKAGE} in
   flatpak)
+    install_flatpak
     flatpak install flathub com.github.micahflee.torbrowser-launcher -y | echo_out
     ;;
   snap)
+    sudo snap install tor-mkg20001
     ;;
   *)
     sudo apt-get -y install torbrowser-launcher | echo_out
@@ -443,6 +449,11 @@ case ${VPN_INSTALL} in
     printf "\nUnrecognized VPN option ${VPN_INSTALL}.\n" 
 	;;
 esac
+
+# WiFi Tools
+if [[ ${WIFI_TOOLS} == "true" ]]; then
+  install_wifi_tools
+fi  
 
 # Create update.sh file
 printf "Creating update.sh\n" | tee /dev/fd/3
