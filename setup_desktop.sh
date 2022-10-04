@@ -9,6 +9,7 @@ ADAPTER1=$(ls /sys/class/net | grep e) 	# 1st Ethernet adapter on VM
 BRANCH="main"							    # Default to main branch
 CHECK_IP="8.8.8.8"						# Test ping to google DNS
 DATE_VAR=$(date +'%y%m%d-%H%M')			# Today's Date and time
+REBOOT_COMPLETE="true"          # Reboot when complete by default
 LOG_FILE="${DATE_VAR}_install.log"  	# Log File name
 PACKAGE="apt" 							  # Install snaps by default
 RTP_ENABLE="false"            # Do not enable RTP by default
@@ -205,7 +206,8 @@ usage() {
   echo "-f			Install Flatpak."
   echo "-h 			Help (this list)."
   echo "-p VPN_NAME	  Install VPN client(s) or 'all'."
-  echo "-s3			Install Snaps"
+  echo "-r      Install and enable RDP."
+  echo "-s			Install Snaps (not flatpak)"
   echo "-v 			Verbose mode."
   echo "-w			WiFi tools (kismet)."
   exit 1
@@ -221,7 +223,7 @@ if [[ $(which git) == "" ]]; then
 fi
 
 # Provide usage statement if no parameters
-while getopts bcdfhp:rsvw OPTION; do
+while getopts bcdfhp:rsvwx OPTION; do
   case ${OPTION} in
   b)
     # Install browser packages
@@ -257,18 +259,21 @@ while getopts bcdfhp:rsvw OPTION; do
 	  echo_out "Snap use set to true"
 	  ;; 
 	v)
-      # Verbose is first so any other elements will echo as well
-      VERBOSE='true'
-      echo_out "Verbose mode on."
-      ;;
+    # Verbose is first so any other elements will echo as well
+    VERBOSE='true'
+    echo_out "Verbose mode on."
+    ;;
 	w)
 	  WIFI_TOOLS='true'
 	  echo_out "WiFi tools will be installed"
 	  ;;
-    ?)
-      echo "invalid option" >&2
-      usage
-      ;;
+  x)
+    REBOOT_COMPLETE="false"
+    ;;
+  ?)
+    echo "invalid option" >&2
+    usage
+    ;;
   esac
 done
 
@@ -512,7 +517,9 @@ sudo apt-get -y clean | echo_out
 sudo rm 70-u2f.rules | echo_out # May not exist
 printf "Complete\n\n" | tee /dev/fd/3
 
-printf "\n\tPress [Enter] to reboot\n" 1>&3
-read throwaway
-
-sudo reboot
+# Reboot by default
+if [[ REBOOT_COMPLETE == "true" ]]; then
+  printf "\n\tPress [Enter] to reboot\n" 1>&3
+  read throwaway
+  sudo reboot
+fi
