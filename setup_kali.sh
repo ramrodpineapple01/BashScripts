@@ -13,9 +13,8 @@ JUP_PATH=/usr/share/jupyter
 ADAPTER1=$(ls /sys/class/net | grep e) 	# 1st Ethernet adapter on VM
 BRANCH="main"							# Default to main branch
 DATE_VAR=$(date +'%y%m%d-%H%M')			# Today's Date and time
-LOG_FILE="${DATE_VAR}_install.log"  	# Log File name
-PACKAGE="snap" 							# Install snaps by default
-VPN_INSTALL="false"						# Do not install VPN clients by default
+LOG_FILE="${DATE_VAR}_kali_install.log"  	# Log File name
+SCRIPT_ARGS=""
 
 ## Functions
 check_root() {
@@ -57,15 +56,19 @@ pause_for () {
 }
 
 usage() {
-  echo "Usage: ${0} [-cfh] [-p VPN_name] " >&2
-  echo "Sets up Kali with useful OSINT apps."
+  echo "Usage: ${0} [-bcfhrsvw] [-p VPN_name] " >&2
+  echo "Sets up Kali Desktop with useful apps."
   #echo "Do not run as root."
   echo
+  echo "-b 			Install multiple browsers."
   echo "-c 			Check internet connection before starting."
-  echo "-f			Install Flatpak."
+  echo "-f			Install Flatpak (not Snaps)."
   echo "-h 			Help (this list)."
-  echo "-p VPN_NAME	Install VPN client(s) or 'all'."
+  echo "-p VPN_NAME	  Install VPN client(s) or 'all'."
+  echo "-r      Install and enable RDP."
+  echo "-s			Install Snaps (not flatpak)"
   echo "-v 			Verbose mode."
+  echo "-w			WiFi tools (kismet)."
   exit 1
 }
 
@@ -74,33 +77,46 @@ usage() {
 touch ${LOG_FILE}
 
 # Provide usage statement if no parameters
-while getopts dfhp:v OPTION; do
+while getopts bcdfhp:rsvw OPTION; do
   case ${OPTION} in
+  b)
+    SCRIPT_ARGS="${SCRIPT_ARGS} -b"
+	  ;;
+  c)
+    SCRIPT_ARGS="${SCRIPT_ARGS} -c"
+	  ;; 
 	d)
 	# Set installation to dev branch
 	  BRANCH="dev"
 	  echo_out "Branch set to dev branch"
 	  ;;
 	f)
-	# Flag for flatpak installation
-	  PACKAGE="flatpak"
-	  echo_out "Flatpak use set to true"
-	  install_flatpak
+	  SCRIPT_ARGS="${SCRIPT_ARGS} -f"
 	  ;;  
 	h)
 	  usage
 	  ;;
 	p)
-	  VPN_INSTALL="${OPTARG}"
+	  SCRIPT_ARGS="${SCRIPT_ARGS} -p ${OPTARG}"
 	  ;;
+  r)
+    SCRIPT_ARGS="${SCRIPT_ARGS} -r"
+	  ;;
+  s)
+    SCRIPT_ARGS="${SCRIPT_ARGS} -s"
+	  ;; 
 	v)
-      VERBOSE='true'
-      echo_out "Verbose mode on."
-      ;;
-    ?)
-      echo "invalid option" >&2
-      usage
-      ;;
+    VERBOSE='true'
+    SCRIPT_ARGS="${SCRIPT_ARGS} -v"
+    echo_out "Verbose mode on."
+    ;;
+  w)
+    SCRIPT_ARGS="${SCRIPT_ARGS} -w"
+	  ;; 
+  ?)
+    echo "invalid option" >&2
+    usage
+    ;;
   esac
 done
 
@@ -138,187 +154,16 @@ echo JUP_PATH=${JUP_PATH} >> ~/osint.config
 mkdir -p "${BIN_PATH}"
 
 
-# Update the base OS
-printf "Updating base OS\n" | tee /dev/fd/3
-sudo apt-get update | echo_out
-sudo apt-get -y install software-properties-common | echo_out
-sudo apt-get -y dist-upgrade | echo_out
-sudo apt-get -y install apt-transport-https | echo_out
-sudo apt-get -y install snapd
-printf "Complete\n\n" | tee /dev/fd/3
+# Download and run desktop script
+if [[ ${BRANCH} == "dev" ]]; then
+  LINK="desktop-dev"
+else
+  LINK="desktop"
+fi
 
-# Add Repositories
-printf "Adding Repositories\n" | tee /dev/fd/3
-echo_out "1" n
-sudo add-apt-repository -y multiverse
-echo_out "\b2" n
-sudo add-apt-repository -y ppa:unit193/encryption
-echo_out "\b3" n
-sudo add-apt-repository -y ppa:yubico/stable
-echo_out "\b4"
-sudo add-apt-repository -y ppa:nextcloud-devs/client
-printf "Complete\n\n" | tee /dev/fd/3
-
-
-# Install VM management software:
-SYSTEM_HW="$(sudo dmidecode -s system-product-name)"
-case ${SYSTEM_HW} in 
-  Virtualbox)
-    printf "Installing VirtualBox Guest Additions\n" | tee /dev/fd/3
-	sudo apt-get -y install dkms | echo_out
-	sudo apt-get -y install gcc | echo_out
-	sudo apt-get -y install make | echo_out
-	sudo apt-get -y install perl | echo_out
-	sudo apt-get -y install virtualbox-guest-additions-iso | echo_out
-	sudo mount -o loop /usr/share/virtualbox/VBoxGuestAdditions.iso /media/ | echo_out
-	/media/autorun.sh
-	;;
-  VMware*)
-    sudo apt install -y --reinstall open-vm-tools-desktop fuse3
-    ;;
-  *)
-    echo_out "No virtualization recognized,"
-	;;
-esac
-printf "Complete\n\n" | tee /dev/fd/3
-
-# Install Tor Browser:
-printf "Installing TOR browser bundle\n" | tee /dev/fd/3
-## You may need this if you get a key error
-# gpg --homedir "$HOME/.local/share/torbrowser/gnupg_homedir" --refresh-keys --keyserver keyserver.ubuntu.com
-case ${PACKAGE} in
-  flatpak)
-    flatpak install flathub com.github.micahflee.torbrowser-launcher -y
-    ;;
-  snap)
-    ;;
-  *)
-    sudo apt-get -y install torbrowser-launcher | echo_out
-	;;
-esac
-
-printf "Complete\n\n" | tee /dev/fd/3
-
-# GTKHash:
-printf "Installing GTKHash\n" | tee /dev/fd/3
-sudo apt-get install -y gtkhash | echo_out
-#sudo snap install gtkhash | tee /dev/fd/3
-printf "Complete\n\n" | tee /dev/fd/3
-
-# Veracrypt:
-printf "Installing Veracrypt\n" | tee /dev/fd/3
-sudo apt-get -y install libwxgtk3.0-gtk3-0v5 | echo_out
-sudo apt-get -y install exfat-fuse exfat-utils | echo_out
-# Use either of these options but not both
-## Option 1
-sudo apt-get -y install veracrypt | echo_out
-## Option 2
-#sudo wget https://launchpad.net/veracrypt/trunk/1.24-update7/+download/veracrypt-console-1.24-Update7-Ubuntu-20.04-amd64.deb
-#sudo apt-get -y install ./veracrypt-console-1.24-Update7-Ubuntu-20.04-amd64.deb | tee /dev/fd/3
-printf "Complete\n\n" | tee /dev/fd/3
-
-# Onionshare:
-#TODO: troubleshoot onionshare snap installation
-printf "Installing Onionshare\n" | tee /dev/fd/3
-
-case ${PACKAGE} in
-  flatpak)
-    flatpak install flathub org.onionshare.OnionShare -y | echo_out
-	;;
-  snap)
-    sudo snap install onionshare | echo_out
-    sudo snap connect onionshare:removable-media | echo_out
-	;;
-  *)
-    # Github install ** TESTING ONLY **
-    #curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python - | tee /dev/fd/3
-    #git clone https://github.com/onionshare/onionshare.git | tee /dev/fd/3
-    #cd onionshare/desktop
-    #poetry install
-    #poetry run ./scripts/get-tor-linux.py
-    #curl -sSL https://go.dev/dl/go1.18.1.linux-amd64.tar.gz
-    #sudo rm -rf /usr/local/go && tar -C /usr/local -xzf go1.18.1.linux-amd64.tar.gz
-    #echo 'export PATH=$PATH:/usr/local/go/bin' | tee -a .bashrc .profile
-	
-	# Temporarily make this the default
-    sudo snap install onionshare | echo_out
-    sudo snap connect onionshare:removable-media | echo_out
-	;;
-esac
-printf "Complete\n\n" | tee /dev/fd/3
-
-# KeepassXC:
-printf "Installing KeePassXC\n" | tee /dev/fd/3
-#sudo apt-get -y install keepassxc | echo_out
-#TODO: Confirm this works with 22.04
-sudo snap install keepassxc | echo_out
-sudo snap connect keepassxc:raw-usb | echo_out
-sudo snap connect keepassxc:removable-media | echo_out
-printf "Complete\n\n" | tee /dev/fd/3
-
-#Yubikey:
-printf "Installing Yubikey\n" | tee /dev/fd/3
-sudo apt-get -y install yubikey-manager | echo_out
-sudo apt-get -y install libykpers-1-1 | echo_out
-
-#For yubikey authorization
-sudo apt-get -y install libpam-u2f | echo_out
-sudo wget https://raw.githubusercontent.com/Yubico/libu2f-host/master/70-u2f.rules -O /etc/udev/rules.d/70-u2f.rules | echo_out
-#sudo mv 70-u2f.rules /etc/udev/rules.d/70-u2f.rules | tee /dev/fd/3
-sudo mkdir -p ~/.config/Yubico | echo_out
-printf "Complete\n\n" | tee /dev/fd/3
-
-#Nextcloud:
-printf "Installing Nextcloud Client\n\nThis can take a while\n" | tee /dev/fd/3
-sudo apt-get -y install nextcloud-client | echo_out
-printf "Complete\n\n" | tee /dev/fd/3
-
-# VPN Clients
-case ${VPN_INSTALL} in
-  false)
-    :
-	;;
-  all)
-    install_airvpn
-	install_ivpn
-    install_mullvad
-    install_openvpn
-	install_nordvpn
-	install_protonvpn
-    ;;
-  airvpn)
-    install_airvpn
-	;;
-  ivpn)
-    install_ivpn
-	;;
-  mullvad)
-    install_mullvad
-	;;
-  nordvpn)
-    install_nordvpn
-	;;
-  openvpn)
-    install_openvpn
-	;;
-  protonvpn)
-    install_protonvpn
-	;;
-  *)
-    printf "\nUnrecognized VPN option ${VPN_INSTALL}.\n" 
-	;;
-esac
-
-# Create update.sh file
-printf "Creating update.sh\n" | tee /dev/fd/3
-cat << EOF > ~/update.sh
-sudo apt update
-sudo apt-get -y dist-upgrade
-sudo apt-get -y autoremove --purge
-sudo apt-get -y clean
-EOF
-sudo chmod 744 ~/update.sh
-printf "Complete\n\n" | tee /dev/fd/3
+cd ~
+wget https://links.clockworx.tech/${LINK}
+bash ${LINK} ${SCRIPT_ARGS} -x
 
 # Load OSINT tools scripts
 printf "Installing OSINT tools and scripts\n" | tee /dev/fd/3
@@ -336,13 +181,6 @@ else
   sudo chmod 755 *.sh
   bash jupyter-install.sh
 fi
-printf "Complete\n\n" | tee /dev/fd/3
-
-# Cleanup
-printf "Cleaning up\n" | tee /dev/fd/3
-sudo apt-get -y autoremove --purge | echo_out
-sudo apt-get -y clean | echo_out
-sudo rm 70-u2f.rules | echo_out # May not exist
 printf "Complete\n\n" | tee /dev/fd/3
 
 printf "\n\tPress [Enter] to reboot\n" 1>&3

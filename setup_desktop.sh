@@ -199,13 +199,13 @@ install_wifi_tools() {
 }
 
 usage() {
-  echo "Usage: ${0} [-bcfh] [-p VPN_name] " >&2
+  echo "Usage: ${0} [-bcfhrsvw] [-p VPN_name] " >&2
   echo "Sets up Ubuntu Desktop with useful apps."
   #echo "Do not run as root."
   echo
   echo "-b 			Install multiple browsers."
   echo "-c 			Check internet connection before starting."
-  echo "-f			Install Flatpak."
+  echo "-f			Install Flatpak (not Snaps)."
   echo "-h 			Help (this list)."
   echo "-p VPN_NAME	  Install VPN client(s) or 'all'."
   echo "-r      Install and enable RDP."
