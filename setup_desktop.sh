@@ -348,13 +348,15 @@ case ${PACKAGE} in
   *)
     mkdir ~/Desktop | echo_out
 	cd ~/Desktop
-    wget https://www.torproject.org/dist/torbrowser/11.5.2/tor-browser-linux64-11.5.2_en-US.tar.xz | echo_out
+  wget https://www.torproject.org/dist/torbrowser/11.5.2/tor-browser-linux64-11.5.2_en-US.tar.xz | echo_out
 	tar -xvf tor-browser-linux64-11.5.2_en-US.tar.xz | echo_out
 	rm tor-browser-linux64-11.5.2_en-US.tar.xz | echo_out
 	ln ./tor-browser_en-US/start-tor-browser.desktop /usr/share/applications/ | echo_out
+  TOR_INSTALL=$(ls | grep tor)
+  cd ${TOR_INSTALL}
+  ./start-tor-browser.desktop --register-app | echo_out
 	;;
 esac
-
 printf "Complete\n\n" | tee /dev/fd/3
 
 # GTKHash:
