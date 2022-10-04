@@ -1,7 +1,7 @@
 #!/bin/bash
 # Ubuntu VM desktop setup script
 # R. Dawson 2021-2022
-VERSION="2.8.0"
+VERSION="2.8.1"
 
 ## Variables
 #TODO: ADAPTER: This works for a VM, but needs a better method
@@ -365,6 +365,7 @@ printf "Complete\n\n" | tee /dev/fd/3
 
 # Veracrypt:
 printf "Installing Veracrypt\n" | tee /dev/fd/3
+printf "\nA warning about a missing repository 'exfat-utils' is expected behavior for Ubuntu 22.04\n\n" | tee /dev/fd/3
 sudo apt-get -y install libwxgtk3.0-gtk3-0v5 | echo_out
 sudo apt-get -y install exfat-fuse exfat-utils | echo_out
 # Use either of these options but not both
@@ -442,7 +443,7 @@ case ${PACKAGE} in
 esac
 printf "Complete\n\n" | tee /dev/fd/3
 
-## Remote Desktop Protocol
+# Remote Desktop Protocol
 if [[ RTP_ENABLE == "true" ]]; then
   printf "Installing and Enabling RDP\n" | tee /dev/fd/3
   sudo apt-get -y install xrdp | echo_out
