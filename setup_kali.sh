@@ -9,12 +9,11 @@ BIN_PATH=${HOME}/Downloads/Programs
 DOC_PATH=${HOME}/Documents/osint
 JUP_PATH=/usr/share/jupyter
 
-#TODO: ADAPTER: This works for a VM, but needs a better method
-ADAPTER1=$(ls /sys/class/net | grep e) 	# 1st Ethernet adapter on VM
-BRANCH="main"							# Default to main branch
-DATE_VAR=$(date +'%y%m%d-%H%M')			# Today's Date and time
-LOG_FILE="${DATE_VAR}_kali_install.log"  	# Log File name
+BRANCH="main"                           # Default to main branch
+DATE_VAR=$(date +'%y%m%d-%H%M')         # Today's Date and time
+LOG_FILE="${DATE_VAR}_kali_install.log" # Log File name
 SCRIPT_ARGS=""
+VERBOSE="false"
 
 ## Functions
 check_root() {
@@ -28,30 +27,32 @@ check_root() {
 echo_out() {
   # Get input from stdin OR $1
   local MESSAGE=${1:-$(</dev/stdin)} | tr -d '\r'
-  
+
   # Check to see if we need a \n
   if [[ "${2}" == 'n' ]]; then
     :
   else
     MESSAGE="${MESSAGE}\n"
   fi
-  
+
   # Decide if we output to console and log or just log
   if [[ "${VERBOSE}" = 'true' ]]; then
     printf "${MESSAGE}" | tee /dev/fd/3
-  else 
-    printf "${MESSAGE}" >> ${LOG_FILE}
+  else
+    printf "${MESSAGE}" >>${LOG_FILE}
   fi
 }
 
-pause_for () {
-  COUNT=${2}
+pause_for() {
+  declare -i COUNT=${2}
   printf "${1}" | tee /dev/fd/3
-  while [ ${COUNT} -gt 0 ]; do 
+  RUN="true"
+  while [ ${RUN} == "true" ]; do
     printf "${COUNT}" | tee /dev/fd/3
-	for (( i=0; i<=${COUNT}; i++ )); do
-	  printf "\b" | tee /dev/fd/3
-	done
+    for ((i = 0; i <= ${COUNT}; i++)); do
+      printf "\b" | tee /dev/fd/3
+    done
+    RUN="false"
   done
 }
 
@@ -81,38 +82,38 @@ while getopts bcdfhp:rsvw OPTION; do
   case ${OPTION} in
   b)
     SCRIPT_ARGS="${SCRIPT_ARGS} -b"
-	  ;;
+    ;;
   c)
     SCRIPT_ARGS="${SCRIPT_ARGS} -c"
-	  ;; 
-	d)
-	# Set installation to dev branch
-	  BRANCH="dev"
-	  echo_out "Branch set to dev branch"
-	  ;;
-	f)
-	  SCRIPT_ARGS="${SCRIPT_ARGS} -f"
-	  ;;  
-	h)
-	  usage
-	  ;;
-	p)
-	  SCRIPT_ARGS="${SCRIPT_ARGS} -p ${OPTARG}"
-	  ;;
+    ;;
+  d)
+    # Set installation to dev branch
+    BRANCH="dev"
+    echo_out "Branch set to dev branch"
+    ;;
+  f)
+    SCRIPT_ARGS="${SCRIPT_ARGS} -f"
+    ;;
+  h)
+    usage
+    ;;
+  p)
+    SCRIPT_ARGS="${SCRIPT_ARGS} -p ${OPTARG}"
+    ;;
   r)
     SCRIPT_ARGS="${SCRIPT_ARGS} -r"
-	  ;;
+    ;;
   s)
     SCRIPT_ARGS="${SCRIPT_ARGS} -s"
-	  ;; 
-	v)
+    ;;
+  v)
     VERBOSE='true'
     SCRIPT_ARGS="${SCRIPT_ARGS} -v"
     echo_out "Verbose mode on."
     ;;
   w)
     SCRIPT_ARGS="${SCRIPT_ARGS} -w"
-	  ;; 
+    ;;
   ?)
     echo "invalid option" >&2
     usage
@@ -124,12 +125,12 @@ done
 exec 3>&1 1>>${LOG_FILE} 2>&1
 
 # Clear the options from the arguments
-shift "$(( OPTIND - 1 ))"
+shift "$((OPTIND - 1))"
 
 # Start installation message
 echo_out "Script version ${VERSION}\n"
 # Get OS distribution
-if [[ "${1}" == "Kali" ]]; then 
+if [[ "${1}" == "Kali" ]]; then
   OS_NAME="Kali"
 elif [[ "${1}" == "Ubuntu" ]]; then
   OS_NAME="Ubuntu"
@@ -137,7 +138,7 @@ else
   OS_NAME=$(lsb_release -a | grep '^Distributor' | cut -c 17-)
 fi
 
-printf "Installing for ${OS_NAME}" | tee /dev/fd/3 
+printf "Installing for ${OS_NAME}" | tee /dev/fd/3
 printf "Ctrl-C to abort" | tee /dev/fd/3
 pause_for "Ctrl-C to abort" 9
 printf "\nThis may take some time and the system may appear to be unresponsive\n" 1>&3
@@ -146,13 +147,12 @@ sudo :
 
 # Create config file
 touch ~/osint.config
-echo DOC_PATH=${DOC_PATH} > ~/osint.config
-echo BIN_PATH=${BIN_PATH} >> ~/osint.config
-echo JUP_PATH=${JUP_PATH} >> ~/osint.config
+echo DOC_PATH=${DOC_PATH} >~/osint.config
+echo BIN_PATH=${BIN_PATH} >>~/osint.config
+echo JUP_PATH=${JUP_PATH} >>~/osint.config
 
 # Create program paths
 mkdir -p "${BIN_PATH}"
-
 
 # Download and run desktop script
 if [[ ${BRANCH} == "dev" ]]; then
@@ -173,11 +173,11 @@ if [[ "${BRANCH}" == "dev" ]]; then
   cd osint
   sudo chmod 755 install.sh
   ./install.sh -d
-else 
+else
   git clone https://github.com/rdbh/osint.git | echo_out
   cd osint
   sudo chmod 755 *.sh
-  cd install 
+  cd install
   sudo chmod 755 *.sh
   bash jupyter-install.sh
 fi
