@@ -1,7 +1,7 @@
 #!/bin/bash
 # Ubuntu VM desktop setup script
 # R. Dawson 2021-2022
-VERSION="2.8.1"
+VERSION="2.8.2"
 
 ## Variables
 #TODO: ADAPTER: This works for a VM, but needs a better method
@@ -176,6 +176,7 @@ install_protonvpn () {
 }
 
 install_wifi_tools() {
+  printf "Installing WiFi tools.\n" | tee /dev/fd/3
   wget -O - https://www.kismetwireless.net/repos/kismet-release.gpg.key | sudo tee /etc/apt/trusted.gpg.d/kismet.asc | echo_out
   echo 'deb https://www.kismetwireless.net/repos/apt/release/jammy jammy main' | sudo tee /etc/apt/sources.list.d/kismet.list | echo_out
   sudo apt update
@@ -193,6 +194,7 @@ install_wifi_tools() {
   git clone https://github.com/radawson/kismon.git kismon
   cd kismon
   sudo make install
+  printf "Kismet and Kismon Installation Complete.\n\n" | tee /dev/fd/3
 
 }
 
@@ -248,10 +250,12 @@ while getopts bcdfhp:rsvwx OPTION; do
 	  ;;
 	p)
 	  VPN_INSTALL="${OPTARG}"
+    echo_out "${OPTARG} configured for VPN client install"
 	  ;;
 
   r)
-    RTP_ENABLE="true"
+    RDP_ENABLE="true"
+    echo_out "Remote Desktop Protocol daemon installation enabled"
     ;;
 	s)
 	# Flag for snap installation
@@ -259,7 +263,6 @@ while getopts bcdfhp:rsvwx OPTION; do
 	  echo_out "Snap use set to true"
 	  ;; 
 	v)
-    # Verbose is first so any other elements will echo as well
     VERBOSE='true'
     echo_out "Verbose mode on."
     ;;
@@ -269,6 +272,7 @@ while getopts bcdfhp:rsvwx OPTION; do
 	  ;;
   x)
     REBOOT_COMPLETE="false"
+    echo_out "Reboot on complete disabled"
     ;;
   ?)
     echo "invalid option" >&2
@@ -502,7 +506,8 @@ fi
 # Create update.sh file
 printf "Creating update.sh\n" | tee /dev/fd/3
 cat << EOF > ~/update.sh
-sudo apt update
+
+sudo apt-get update
 sudo apt-get -y dist-upgrade
 sudo apt-get -y autoremove --purge
 sudo apt-get -y clean
