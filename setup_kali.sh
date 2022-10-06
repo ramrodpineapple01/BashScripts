@@ -155,15 +155,18 @@ echo JUP_PATH=${JUP_PATH} >>~/osint.config
 mkdir -p "${BIN_PATH}"
 
 # Download and run desktop script
+printf "\nInstalling desktop from ${BRANCH} branch.\n\n" | tee /dev/fd/3
 if [[ ${BRANCH} == "dev" ]]; then
   LINK="desktop-dev"
 else
   LINK="desktop"
 fi
 
-cd ~
+cd ${HOME}
 wget https://links.clockworx.tech/${LINK}
-bash ${LINK} ${SCRIPT_ARGS} -x
+bash ${LINK} ${SCRIPT_ARGS} -x | echo_out
+rm ${LINK}
+printf "\nDesktop Script complete\n\n"
 
 # Load OSINT tools scripts
 printf "Installing OSINT tools and scripts\n" | tee /dev/fd/3
