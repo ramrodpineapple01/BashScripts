@@ -30,8 +30,7 @@ sudo systemctl restart apache2
 sudo mkdir -p /var/www/qst/schools/qst_files/photos
 sudo chmod 777 -R /var/www/qst/schools
 
-cd /home 
-sudo mkdir MyApache2 
+sudo mkdir /home/MyApache2 
 cd ~/qst_linux 
 sudo cp QST.pm /home/MyApache2 
 sudo cp startup.pl /home/MyApache2 
@@ -92,4 +91,3 @@ sudo cpan -i Exporter
 sudo perl -MCPAN -e 'install Apache::DBI'
 
 sudo service apache2 start      
-sudo service apache2 stop
