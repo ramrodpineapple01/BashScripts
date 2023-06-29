@@ -73,8 +73,6 @@ EOFMYSQL
 
 sudo sed -i 's$= /var/run/mysqld/mysqld.sock$= /run/mysqld/mysqld.sock$g' /etc/mysql/mysql.conf.d/mysqld.cnf
 
-read -p "Pause here to do mysql things" nothing
-
 mysql -u qstuser -pQstyreg#389 qst <~/qst_linux/qst.sql
 
 sudo apt-get update 
@@ -90,4 +88,4 @@ sudo cpan -i Archive::Zip
 sudo cpan -i Exporter
 sudo perl -MCPAN -e 'install Apache::DBI'
 
-sudo service apache2 start      
+sudo systemctl restart apache2
