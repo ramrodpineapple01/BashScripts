@@ -43,7 +43,7 @@ sudo zcat /usr/share/zabbix-sql-scripts/mysql/server.sql.gz | mysql --default-ch
 
 sudo mysql -u root -e "set global log_bin_trust_function_creators = 0"
 
-sudo sed -i 's/DBPassword=password/DBPassword=password/g' /etc/zabbix/zabbix_server.conf
+sudo sed -i 's/# DBPassword=password/DBPassword=password/g' /etc/zabbix/zabbix_server.conf
 
 sudo systemctl restart zabbix-server zabbix-agent apache2
 sudo systemctl enable zabbix-server zabbix-agent apache2

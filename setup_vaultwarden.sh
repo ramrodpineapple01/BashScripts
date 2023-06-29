@@ -20,7 +20,7 @@ sudo apt-get -y remove runc
 sudo apt-get -y install ca-certificates 
 sudo apt-get -y install curl 
 sudo apt-get -y install gnupg 
-sudo apt-get -y installlsb-release
+sudo apt-get -y install lsb-release
 
 # Add docker GPG key
 if [[ ! -f /usr/share/keyrings/docker-archive-keyring.gpg ]]; then
