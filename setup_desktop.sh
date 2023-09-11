@@ -1,14 +1,14 @@
 #!/bin/bash
 # Ubuntu VM desktop setup script
 # R. Dawson 2021-2023
-VERSION="2.8.8"
+VERSION="2.8.9"
 
 ## Variables
 #TODO: ADAPTER: This works for a VM, but needs a better method
 ADAPTER1=$(ls /sys/class/net | grep e) 	# 1st Ethernet adapter on VM
 BRANCH="main"							    # Default to main branch
 CHECK_IP="8.8.8.8"						# Test ping to google DNS
-DATE_VAR=$(date +'%y%m%d-%H%M')			# Today's Date and time
+DATE_VAR=$(date +'%y%m%d-%H%M')	# Today's Date and time
 REBOOT_COMPLETE="true"          # Reboot when complete by default
 LOG_FILE="${DATE_VAR}_desktop_install.log"  	# Log File name
 PACKAGE="apt" 							  # Install snaps by default
@@ -548,7 +548,7 @@ if [[ ${PACKAGE} == "flatpak" ]]; then
 fi
 
 # Reboot by default
-if [[ REBOOT_COMPLETE == "true" ]]; then
+if [[ ${REBOOT_COMPLETE} == "true" ]]; then
   printf "\n\tPress [Enter] to reboot\n" 1>&3
   read throwaway
   sudo reboot
