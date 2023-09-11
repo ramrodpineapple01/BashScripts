@@ -1,7 +1,7 @@
 #!/bin/bash
 # Ubuntu VM desktop setup script
-# R. Dawson 2021-2022
-VERSION="2.8.3"
+# R. Dawson 2021-2023
+VERSION="2.8.4"
 
 ## Variables
 #TODO: ADAPTER: This works for a VM, but needs a better method
@@ -207,7 +207,7 @@ usage() {
   echo "-c 			Check internet connection before starting."
   echo "-f			Install Flatpak (not Snaps)."
   echo "-h 			Help (this list)."
-  echo "-p VPN_NAME	  Install VPN client(s) or 'all'."
+  echo "-p      VPN_NAME	  Install VPN client(s) or 'all'."
   echo "-r      Install and enable RDP."
   echo "-s			Install Snaps (not flatpak)"
   echo "-v 			Verbose mode."
@@ -332,7 +332,7 @@ case ${SYSTEM_HW} in
     sudo apt install -y --reinstall open-vm-tools-desktop fuse3
     ;;
   *)
-    echo_out "No virtualization recognized,"
+    echo_out "No virtualization recognized."
 	;;
 esac
 printf "Complete\n\n" | tee /dev/fd/3
@@ -383,8 +383,8 @@ sudo apt-get -y install exfat-fuse exfat-utils | echo_out
 ## Option 1
 sudo apt-get -y install veracrypt | echo_out
 ## Option 2
-#sudo wget https://launchpad.net/veracrypt/trunk/1.24-update7/+download/veracrypt-console-1.24-Update7-Ubuntu-20.04-amd64.deb
-#sudo apt-get -y install ./veracrypt-console-1.24-Update7-Ubuntu-20.04-amd64.deb | tee /dev/fd/3
+#sudo wget https://launchpad.net/veracrypt/trunk/1.25.9/+download/veracrypt-1.25.9-Ubuntu-22.04-amd64.deb
+#sudo apt-get -y install ./veracrypt*.deb | tee /dev/fd/3
 printf "Complete\n\n" | tee /dev/fd/3
 
 # Onionshare:
@@ -455,7 +455,7 @@ esac
 printf "Complete\n\n" | tee /dev/fd/3
 
 # Remote Desktop Protocol
-if [[ RTP_ENABLE == "true" ]]; then
+if [[ RDP_ENABLE == "true" ]]; then
   printf "Installing and Enabling RDP\n" | tee /dev/fd/3
   sudo apt-get -y install xrdp | echo_out
   sudo systemctl enable xrdp --now | echo_out
@@ -469,11 +469,11 @@ case ${VPN_INSTALL} in
 	;;
   all)
     install_airvpn
-	install_ivpn
+	  install_ivpn
     install_mullvad
     install_openvpn
-	install_nordvpn
-	install_protonvpn
+	  install_nordvpn
+	  install_protonvpn
     ;;
   airvpn)
     install_airvpn
@@ -505,13 +505,14 @@ fi
 
 # Create update.sh file
 printf "Creating update.sh\n" | tee /dev/fd/3
-cat << EOF > ~/update.sh
-
+cat << @EOF > ~/update.sh
+#!/bin/bash
 sudo apt-get update
 sudo apt-get -y dist-upgrade
 sudo apt-get -y autoremove --purge
 sudo apt-get -y clean
-EOF
+echo "Update complete"
+@EOF
 sudo chmod 744 ~/update.sh
 printf "Complete\n\n" | tee /dev/fd/3
 
