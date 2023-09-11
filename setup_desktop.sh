@@ -219,11 +219,6 @@ usage() {
 # Create a log file with current date and time
 touch ${LOG_FILE}
 
-# Install git
-if [[ $(which git) == "" ]]; then
-  sudo apt-get -y install git
-fi
-
 # Provide usage statement if no parameters
 while getopts bcdfhp:rsvwx OPTION; do
   case ${OPTION} in
@@ -292,7 +287,11 @@ echo_out "Script version ${VERSION}\n"
 printf "\nConfiguring Ubuntu Desktop\n" 1>&3
 printf "\nThis may take some time and the system may appear to be unresponsive\n" 1>&3
 printf "\nPlease be patient\n\n" 1>&3
-sudo :
+
+# Install git
+if [[ $(which git) == "" ]]; then
+  sudo apt-get -y install git
+fi
 
 # Add Repositories
 printf "Adding Repositories\n" | tee /dev/fd/3
