@@ -1,7 +1,7 @@
 #!/bin/bash
 # Ubuntu VM desktop setup script
 # R. Dawson 2021-2023
-VERSION="2.8.5"
+VERSION="2.8.7"
 
 ## Variables
 #TODO: ADAPTER: This works for a VM, but needs a better method
@@ -241,6 +241,7 @@ while getopts bcdfhp:rsvwx OPTION; do
 	  echo_out "Flatpak use set to true"
 	  ;;  
 	h)
+  # Help statement
 	  usage
 	  ;;
 	p)
@@ -288,11 +289,6 @@ printf "\nConfiguring Ubuntu Desktop\n" 1>&3
 printf "\nThis may take some time and the system may appear to be unresponsive\n" 1>&3
 printf "\nPlease be patient\n\n" 1>&3
 
-# Install git
-if [[ $(which git) == "" ]]; then
-  sudo apt-get -y install git
-fi
-
 # Add Repositories
 printf "Adding Repositories\n" | tee /dev/fd/3
 echo_out "1" n
@@ -312,6 +308,20 @@ sudo apt-get -y install software-properties-common | echo_out
 sudo apt-get -y dist-upgrade | echo_out
 sudo apt-get -y install apt-transport-https | echo_out
 printf "Complete\n\n" | tee /dev/fd/3
+
+# Install git
+if [[ $(which git) == "" ]]; then
+  printf "Installing git\n" | tee /dev/fd/3
+  sudo apt-get -y install git
+  printf "Complete\n\n" | tee /dev/fd/3
+fi
+
+# Install flatpak
+if [[ ${PACKAGE} == "flatpak" ]]; then
+  printf "Installing flatpak\n" | tee /dev/fd/3
+  install_flatpak
+  printf "Complete\n\n" | tee /dev/fd/3
+fi
 
 # Install VM management software:
 printf "Checking for Virtual Machine\n\n" | tee /dev/fd/3
@@ -358,7 +368,6 @@ printf "Installing TOR browser bundle\n" | tee /dev/fd/3
 # gpg --homedir "$HOME/.local/share/torbrowser/gnupg_homedir" --refresh-keys --keyserver keyserver.ubuntu.com
 case ${PACKAGE} in
   flatpak)
-    install_flatpak
     flatpak install flathub com.github.micahflee.torbrowser-launcher -y | echo_out
     ;;
   snap)
