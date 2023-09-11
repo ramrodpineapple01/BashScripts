@@ -1,7 +1,7 @@
 #!/bin/bash
 # Ubuntu VM desktop setup script
 # R. Dawson 2021-2023
-VERSION="2.8.4"
+VERSION="2.8.5"
 
 ## Variables
 #TODO: ADAPTER: This works for a VM, but needs a better method
