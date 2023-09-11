@@ -326,7 +326,7 @@ case ${SYSTEM_HW} in
     sudo apt-get -y install qemu-guest-agent | echo_out
     printf "Complete\n\n" | tee /dev/fd/3
     ;;
-  Virtualbox)
+  Virtualbox*)
     printf "Installing VirtualBox Guest Additions\n" | tee /dev/fd/3
 	sudo apt-get -y install dkms | echo_out
 	sudo apt-get -y install gcc | echo_out
