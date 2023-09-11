@@ -1,7 +1,7 @@
 #!/bin/bash
 # Ubuntu VM desktop setup script
 # R. Dawson 2021-2023
-VERSION="2.8.7"
+VERSION="2.8.8"
 
 ## Variables
 #TODO: ADAPTER: This works for a VM, but needs a better method
@@ -339,14 +339,14 @@ case ${SYSTEM_HW} in
     ;;
   VirtualBox*|Virtualbox*)
     printf "\tInstalling VirtualBox Guest Additions\n" | tee /dev/fd/3
-	sudo apt-get -y install dkms | echo_out
-	sudo apt-get -y install gcc | echo_out
-	sudo apt-get -y install make | echo_out
-	sudo apt-get -y install perl | echo_out
-	sudo apt-get -y install virtualbox-guest-additions-iso | echo_out
-	sudo mount -o loop /usr/share/virtualbox/VBoxGuestAdditions.iso /media/ | echo_out
-	/media/autorun.sh
-	;;
+	  sudo apt-get -y install dkms | echo_out
+	  sudo apt-get -y install gcc | echo_out
+	  sudo apt-get -y install make | echo_out
+	  sudo apt-get -y install perl | echo_out
+	  sudo apt-get -y install virtualbox-guest-additions-iso | echo_out
+	  sudo mount -o loop /usr/share/virtualbox/VBoxGuestAdditions.iso /media/ | echo_out
+	  /media/autorun.sh
+	  ;;
   VMware*)
     printf "\tInstalling VMWare Tools\n" | tee /dev/fd/3
     sudo apt install -y --reinstall open-vm-tools-desktop fuse3
@@ -541,6 +541,11 @@ sudo apt-get -y autoremove --purge | echo_out
 sudo apt-get -y clean | echo_out
 sudo rm 70-u2f.rules | echo_out # May not exist
 printf "Complete\n\n" | tee /dev/fd/3
+
+# Flatpak message
+if [[ ${PACKAGE} == "flatpak" ]]; then
+  printf "Flatpak apps will be visible in Launcher after reboot\n" | tee /dev/fd/3
+fi
 
 # Reboot by default
 if [[ REBOOT_COMPLETE == "true" ]]; then
