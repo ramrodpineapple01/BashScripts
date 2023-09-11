@@ -314,20 +314,21 @@ sudo apt-get -y install apt-transport-https | echo_out
 printf "Complete\n\n" | tee /dev/fd/3
 
 # Install VM management software:
+printf "Checking for Virtual Machine\n\n" | tee /dev/fd/3
 SYSTEM_HW="$(sudo dmidecode -s system-product-name)"
 case ${SYSTEM_HW} in 
   Parallels*)
-    printf "Installing VM management software\n" | tee /dev/fd/3
+    printf "\tInstalling VM management software\n" | tee /dev/fd/3
     sudo apt-get -y install prltools-linux | echo_out
     printf "Complete\n\n" | tee /dev/fd/3
     ;;
   QEMU*)
-    printf "Installing VM management software\n" | tee /dev/fd/3
+    printf "\tInstalling VM management software\n" | tee /dev/fd/3
     sudo apt-get -y install qemu-guest-agent | echo_out
     printf "Complete\n\n" | tee /dev/fd/3
     ;;
   Virtualbox*)
-    printf "Installing VirtualBox Guest Additions\n" | tee /dev/fd/3
+    printf "\tInstalling VirtualBox Guest Additions\n" | tee /dev/fd/3
 	sudo apt-get -y install dkms | echo_out
 	sudo apt-get -y install gcc | echo_out
 	sudo apt-get -y install make | echo_out
@@ -337,11 +338,11 @@ case ${SYSTEM_HW} in
 	/media/autorun.sh
 	;;
   VMware*)
-    printf "Installing VMWare Tools\n" | tee /dev/fd/3
+    printf "\tInstalling VMWare Tools\n" | tee /dev/fd/3
     sudo apt install -y --reinstall open-vm-tools-desktop fuse3
     ;;
   *)
-    echo_out "No virtualization recognized."
+    echo_out "\tNo virtualization recognized.\n"
 	;;
 esac
 printf "Complete\n\n" | tee /dev/fd/3
