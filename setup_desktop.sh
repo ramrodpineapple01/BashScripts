@@ -316,6 +316,16 @@ printf "Complete\n\n" | tee /dev/fd/3
 # Install VM management software:
 SYSTEM_HW="$(sudo dmidecode -s system-product-name)"
 case ${SYSTEM_HW} in 
+  Parallels*)
+    printf "Installing VM management software\n" | tee /dev/fd/3
+    sudo apt-get -y install prltools-linux | echo_out
+    printf "Complete\n\n" | tee /dev/fd/3
+    ;;
+  QEMU*)
+    printf "Installing VM management software\n" | tee /dev/fd/3
+    sudo apt-get -y install qemu-guest-agent | echo_out
+    printf "Complete\n\n" | tee /dev/fd/3
+    ;;
   Virtualbox)
     printf "Installing VirtualBox Guest Additions\n" | tee /dev/fd/3
 	sudo apt-get -y install dkms | echo_out
