@@ -145,7 +145,7 @@ install_ivpn() {
 install_mullvad () {
   printf "Installing Mullvad VPN client.\n" | tee /dev/fd/3
   wget --content-disposition https://mullvad.net/download/app/deb/latest | echo_out
-  MV_PACKAGE=$(cat ls | grep Mullvad)
+  MV_PACKAGE=$(ls | grep Mullvad)
   sudo apt-get -y install ./"${MV_PACKAGE}" | echo_out
   printf "Mullvad Installation VPN Complete.\n\n" | tee /dev/fd/3
 }
