@@ -1,7 +1,7 @@
 #!/bin/bash
 # Ubuntu VM desktop setup script
 # R. Dawson 2021-2023
-VERSION="2.8.10"
+VERSION="2.9.0"
 
 ## Variables
 #TODO: ADAPTER: This works for a VM, but needs a better method
@@ -12,6 +12,7 @@ DATE_VAR=$(date +'%y%m%d-%H%M')	# Today's Date and time
 REBOOT_COMPLETE="true"          # Reboot when complete by default
 LOG_FILE="${DATE_VAR}_desktop_install.log"  	# Log File name
 PACKAGE="apt" 							  # Install snaps by default
+JRE_INSTALL="false"						# Do not install default JRE by default
 RTP_ENABLE="false"            # Do not enable RTP by default
 VPN_INSTALL="false"						# Do not install VPN clients by default
 WIFI_TOOLS="false"						# Do not install wifi tools by default
@@ -199,7 +200,7 @@ install_wifi_tools() {
 }
 
 usage() {
-  echo "Usage: ${0} [-bcfhrsvw] [-p VPN_name] " >&2
+  echo "Usage: ${0} [-bcfhjrsvw] [-p VPN_name] " >&2
   echo "Sets up Ubuntu Desktop with useful apps."
   #echo "Do not run as root."
   echo
@@ -207,6 +208,7 @@ usage() {
   echo "-c 			Check internet connection before starting."
   echo "-f			Install Flatpak (not Snaps)."
   echo "-h 			Help (this list)."
+  echo "-j      Install default JRE."
   echo "-p      VPN_NAME	  Install VPN client(s) or 'all'."
   echo "-r      Install and enable RDP."
   echo "-s			Install Snaps (not flatpak)"
@@ -220,7 +222,7 @@ usage() {
 touch ${LOG_FILE}
 
 # Provide usage statement if no parameters
-while getopts bcdfhp:rsvwx OPTION; do
+while getopts bcdfhjp:rsvwx OPTION; do
   case ${OPTION} in
   b)
     # Install browser packages
@@ -244,6 +246,10 @@ while getopts bcdfhp:rsvwx OPTION; do
   # Help statement
 	  usage
 	  ;;
+  j)
+    # Install default JRE
+    JRE_INSTALL="true"
+    ;;
 	p)
 	  VPN_INSTALL="${OPTARG}"
     echo_out "${OPTARG} configured for VPN client install"
@@ -307,6 +313,9 @@ sudo apt-get update | echo_out
 sudo apt-get -y install software-properties-common | echo_out
 sudo apt-get -y dist-upgrade | echo_out
 sudo apt-get -y install apt-transport-https | echo_out
+if JRE_INSTALL == "true"; then
+  sudo apt-get -y install default-jre | echo_out
+fi
 printf "Complete\n\n" | tee /dev/fd/3
 
 # Install git
