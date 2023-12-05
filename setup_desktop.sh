@@ -334,6 +334,7 @@ fi
 
 # Install VM management software:
 printf "Checking for Virtual Machine\n\n" | tee /dev/fd/3
+# TODO: Add checks for VM management software already installed
 SYSTEM_HW="$(sudo dmidecode -s system-product-name)"
 case ${SYSTEM_HW} in 
   Parallels*)
