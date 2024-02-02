@@ -1,4 +1,5 @@
 #!/bin/bash
+## copyright R. Dawson 2024
 VERSION='1.0.1'
 
 printf "Jupyterhub installation script v${VERSION}\n"
