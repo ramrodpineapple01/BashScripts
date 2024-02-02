@@ -66,7 +66,7 @@ cat <<\EOF > run-jhub.sh
 #!/bin/bash
 CONFIG_FILE='/etc/jupyterhub/jupyterhub_config.py'
 
-echo 'Starting Jupyterhub from ${CONFIG_FILE}'
+echo 'Starting Jupyterhub from '${CONFIG_FILE}
 sudo jupyterhub -f ${CONFIG_FILE}
 EOF
 sudo chmod +x run-jhub.sh
