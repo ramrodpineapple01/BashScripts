@@ -28,9 +28,11 @@ sudo apt-get -y install python3-pip
 curl -fsSL https://deb.nodesource.com/setup_21.x | sudo -E bash - &&\
 sudo apt-get -y install nodejs
 
+## Install configurable-proxy
+sudo npm install -g configurable-http-proxy
+
 ## Install JupyterHub
 sudo python3 -m pip install jupyterhub
-sudo npm install -g configurable-http-proxy
 sudo python3 -m pip install jupyterlab notebook  # needed if running the notebook servers in the same environment
 
 ## Add /notebooks directory to all new users (and current user)
@@ -66,3 +68,4 @@ CONFIG_FILE='/etc/jupyterhub/jupyterhub_config.py'
 echo 'Starting Jupyterhub from ${CONFIG_FILE}'
 sudo jupyterhub -f ${CONFIG_FILE}
 EOF
+sudo chmod +x run-jhub.sh
