@@ -7,7 +7,7 @@ sudo apt-get -y autoremove
 sudo apt-get -y clean
 
 sudo apt-get -y install unattended-upgrades
-sudo nano /etc/apt/apt.conf.d/20auto-upgrades
+#sudo nano /etc/apt/apt.conf.d/20auto-upgrades
 #APT::Periodic::Update-Package-Lists "1";
 #APT::Periodic::Unattended-Upgrade "1";
 
@@ -19,6 +19,7 @@ sudo sed -i 's|//Unattended-Upgrade::Remove-Unused-Dependencies "false";|Unatten
 
 sudo ufw allow http
 sudo ufw allow https
+sudo ufw allow 8000
 
 ## Install pip
 sudo apt-get -y install python3-pip
