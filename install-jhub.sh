@@ -41,7 +41,6 @@ mkdir ~/notebooks
 username=admin
 password=jovyan # <-- Change This!
 
-sudo adduser --comment "" --disabled-password ${username}
 sudo chpasswd <<<"${username}:${password}"
 
 ## Generate a configuration file
@@ -59,10 +58,11 @@ sudo mkdir -p /etc/jupyterhub
 sudo cp jupyterhub_config.py /etc/jupyterhub
 
 ## Create Startup script
-echo <<\EOF > run-jhub.sh
+cat <<\EOF > run-jhub.sh
 #!/bin/bash
 CONFIG_FILE='/etc/jupyterhub/jupyterhub_config.py'
 
 echo 'Starting Jupyterhub from ${CONFIG_FILE}'
 sudo jupyterhub -f ${CONFIG_FILE}
 EOF
+sudo chmod +x run-jhub.sh
