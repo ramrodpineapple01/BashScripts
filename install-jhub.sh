@@ -42,3 +42,11 @@ sudo sed -i 's/# c.JupyterHub.internal_ssl = False/c.JupyterHub.internal_ssl = T
 sudo mkdir -p /etc/jupyterhub
 sudo cp jupyterhub_config.py /etc/jupyterhub
 
+## Create Startup script
+echo <<\EOF > run-jhub.sh
+#!/bin/bash
+CONFIG_FILE='/etc/jupyterhub/jupyterhub_config.py'
+
+echo 'Starting Jupyterhub from ${CONFIG_FILE}'
+sudo jupyterhub -f ${CONFIG_FILE}
+EOF
