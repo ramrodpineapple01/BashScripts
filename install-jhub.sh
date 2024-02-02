@@ -46,11 +46,12 @@ sudo chpasswd <<<"${username}:${password}"
 ## Generate a configuration file
 sudo jupyterhub --generate-config
 
-## initial security setup
+## Initial security setup 
+## This also makes the installation user a JHub admin
 sudo sed -i "s|# c.JupyterHub.internal_ssl = False|c.JupyterHub.internal_ssl = True|g" jupyterhub_config.py
 sudo sed -i "s|# c.Spawner.default_url = ''|c.Spawner.default_url = '/tree/home/{username}'|g" jupyterhub_config.py
 sudo sed -i "s|# c.Spawner.notebook_dir = ''|c.Spawner.notebook_dir = '~/notebooks'|g" jupyterhub_config.py
-sudo sed -i "s|# c.Authenticator.admin_users = set()|c.Authenticator.admin_users = {'admin', 'ghostrider'}|g" jupyterhub_config.py
+sudo sed -i "s|# c.Authenticator.admin_users = set()|c.Authenticator.admin_users = {'admin', '${USER}'}|g" jupyterhub_config.py
 
 ## Copy current configuration file to /etc/JupyterHub
 sudo mkdir -p /etc/jupyterhub
