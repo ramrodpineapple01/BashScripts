@@ -1,4 +1,7 @@
 #!/bin/bash
+VERSION='1.0.1'
+
+printf "Jupyterhub installation script v${VERSION}\n"
 
 # Server Prep
 sudo apt update
