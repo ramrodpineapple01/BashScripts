@@ -40,7 +40,7 @@ sudo python3 -m pip install jupyterhub
 sudo python3 -m pip install jupyterlab notebook  # needed if running the notebook servers in the same environment
 
 ## Install Jupyter AI
-sudo python -m pip install jupyter-ai
+sudo python3 -m pip install jupyter-ai
 
 ## Add /notebooks directory to all new users (and current user)
 sudo mkdir /etc/skel/notebooks
