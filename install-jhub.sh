@@ -39,6 +39,9 @@ sudo npm install -g configurable-http-proxy
 sudo python3 -m pip install jupyterhub
 sudo python3 -m pip install jupyterlab notebook  # needed if running the notebook servers in the same environment
 
+## Install Jupyter AI
+sudo python -m pip install jupyter-ai
+
 ## Add /notebooks directory to all new users (and current user)
 sudo mkdir /etc/skel/notebooks
 mkdir ~/notebooks
@@ -59,7 +62,7 @@ sudo sed -i "s|# c.JupyterHub.internal_ssl = False|c.JupyterHub.internal_ssl = T
 #sudo sed -i "s|# c.Spawner.default_url = ''|c.Spawner.default_url = '/tree/home/{username}'|g" jupyterhub_config.py
 sudo sed -i "s|# c.Spawner.notebook_dir = ''|c.Spawner.notebook_dir = '~/notebooks'|g" jupyterhub_config.py
 sudo sed -i "s|# c.Authenticator.admin_users = set()|c.Authenticator.admin_users = {'admin', '${USER}'}|g" jupyterhub_config.py
-sudo echo c.LocalAuthenticator.create_system_users=True >> jupyterhub_config.py
+echo c.LocalAuthenticator.create_system_users=True | sudo tee -a jupyterhub_config.py > /dev/null
 
 ## Copy current configuration file to /etc/JupyterHub
 sudo mkdir -p /etc/jupyterhub
