@@ -39,6 +39,10 @@ sudo npm install -g configurable-http-proxy
 sudo python3 -m pip install jupyterhub
 sudo python3 -m pip install jupyterlab notebook  # needed if running the notebook servers in the same environment
 
+## Install BASH kernel
+sudo python3 -m pip install bash_kernel
+sudo python3 -m bash_kernel.install
+
 ## Install Jupyter AI
 sudo python3 -m pip install jupyter-ai
 
