@@ -1,6 +1,6 @@
 #!/bin/bash
 ## copyright R. Dawson 2024
-VERSION='1.0.1'
+VERSION='1.1.1'
 
 printf "Jupyterhub installation script v${VERSION}\n"
 
@@ -14,6 +14,7 @@ sudo apt-get -y install unattended-upgrades
 #sudo nano /etc/apt/apt.conf.d/20auto-upgrades
 #APT::Periodic::Update-Package-Lists "1";
 #APT::Periodic::Unattended-Upgrade "1";
+sudo dpkg-reconfigure -plow unattended-upgrades
 
 #sudo nano /etc/apt/apt.conf.d/50unattended-upgrades
 sudo sed -i 's|//Unattended-Upgrade::AutoFixInterruptedDpkg "true";|Unattended-Upgrade::AutoFixInterruptedDpkg "true";|g' /etc/apt/apt.conf.d/50unattended-upgrades
