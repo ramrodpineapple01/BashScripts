@@ -29,6 +29,12 @@ sudo ufw allow 8000
 ## Install pip
 sudo apt-get -y install python3-pip
 
+## Get python version
+p_version=$(python3 --version | sed 's/Python //g' | cut -d. -f1,2)
+
+## Install venv
+sudo apt-get -y install python${p_version}-venv
+
 ## Install nodejs
 curl -fsSL https://deb.nodesource.com/setup_21.x | sudo -E bash - &&\
 sudo apt-get -y install nodejs
@@ -36,16 +42,21 @@ sudo apt-get -y install nodejs
 ## Install configurable-proxy
 sudo npm install -g configurable-http-proxy
 
+## Create Virtual Environment for Jupyterhub
+sudo python3 -m venv /opt/jupyterhub/
+
 ## Install JupyterHub
-sudo python3 -m pip install jupyterhub
-sudo python3 -m pip install jupyterlab notebook  # needed if running the notebook servers in the same environment
+sudo /opt/jupyterhub/bin/python3 -m pip install wheel
+sudo /opt/jupyterhub/bin/python3 -m pip install jupyterhub
+sudo /opt/jupyterhub/bin/python3 -m pip install jupyterlab notebook  # needed if running the notebook servers in the same environment
+sudo /opt/jupyterhub/bin/python3 -m pip install ipywidgets
 
 ## Install BASH kernel
-sudo python3 -m pip install bash_kernel
-sudo python3 -m bash_kernel.install
+sudo /opt/jupyterhub/bin/python3 -m pip install bash_kernel
+sudo /opt/jupyterhub/bin/python3 -m bash_kernel.install
 
 ## Install Jupyter AI
-sudo python3 -m pip install jupyter-ai
+sudo /opt/jupyterhub/bin/python3 -m pip install jupyter-ai
 
 ## Add /notebooks directory to all new users (and current user)
 sudo mkdir /etc/skel/notebooks
@@ -58,8 +69,12 @@ password=jovyan # <-- Change This!
 sudo adduser --gecos "" --disabled-password ${username}
 sudo chpasswd <<<"${username}:${password}"
 
+## Create the folder for the JupyterHub configuration
+sudo mkdir -p /opt/jupyterhub/etc/jupyterhub/
+cd /opt/jupyterhub/etc/jupyterhub/
+
 ## Generate a configuration file
-sudo jupyterhub --generate-config
+sudo /opt/jupyterhub/bin/jupyterhub --generate-config
 
 ## Initial security setup 
 ## This also makes the installation user a JHub admin
@@ -69,21 +84,87 @@ sudo sed -i "s|# c.Spawner.notebook_dir = ''|c.Spawner.notebook_dir = '~/noteboo
 sudo sed -i "s|# c.Authenticator.admin_users = set()|c.Authenticator.admin_users = {'admin', '${USER}'}|g" jupyterhub_config.py
 echo c.LocalAuthenticator.create_system_users=True | sudo tee -a jupyterhub_config.py > /dev/null
 
+## Install PostgreSQL for production
+# Create the file repository configuration:
+sudo sh -c 'echo "deb https://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
+
+# Import the repository signing key:
+wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
+
+# Update the package lists:
+sudo apt-get update
+
+# Install the latest version of PostgreSQL.
+# If you want a specific version, use 'postgresql-12' or similar instead of 'postgresql':
+sudo apt-get -y install postgresql postgresql-contrib
+
+# Install the SQLAlchemy library for Postgres
+sudo pip install psycopg2-binary
+
+# Generate userdb user password 
+password=$(dd if=/dev/urandom bs=18 count=1 2>/dev/null | base64)
+echo ${password}
+
+# Create postgres database user
+sudo -u postgres createuser -a jhub
+
+# Create postgres database
+sudo -u postgres createdb jhub
+
+# Set postgres database in the configuration
+sudo sed -i "s|# c.JupyterHub.db_url = 'sqlite:///jupyterhub.sqlite'|c.JupyterHub.db_url = 'postgresql+psycopg2://jhub:${password}@127.0.0.1:5432/jhub'|g" jupyterhub_config.py
+
 ## Copy current configuration file to /etc/JupyterHub
 sudo mkdir -p /etc/jupyterhub
 sudo cp jupyterhub_config.py /etc/jupyterhub
 
 ## Create Startup script
-cat <<\EOF > run-jhub.sh
+cat <<!EOF > run-jhub.sh
 #!/bin/bash
 CONFIG_FILE='/etc/jupyterhub/jupyterhub_config.py'
 
 echo 'Starting Jupyterhub from '${CONFIG_FILE}
-sudo jupyterhub -f ${CONFIG_FILE}
-EOF
+sudo /opt/jupyterhub/bin/jupyterhub -f ${CONFIG_FILE}
+!EOF
+
+## Create Config Edit Script
+cat <<!EOF > edit-config.sh
+#!/bin/bash
+
+sudo nano /opt/jupyterhub/etc/jupyterhub/jupyterhub_config.py
+
+sudo cp /opt/jupyterhub/etc/jupyterhub/jupyterhub_config.py /etc/jupyterhub/jupyterhub_config.py
+!EOF
+
 sudo chmod +x run-jhub.sh
 
 ## Install typical useful libraries
-sudo python3 -m pip install ipyleaflet
-sudo python3 -m pip install pandas
-sudo python3 -m pip install geopandas
+sudo /opt/jupyterhub/bin/python3 -m pip install ipyleaflet
+sudo /opt/jupyterhub/bin/python3 -m pip install pandas
+sudo /opt/jupyterhub/bin/python3 -m pip install geopandas
+
+## Create systemd file
+cat <<!EOF > jupyterhub.service
+[Unit]
+Description=JupyterHub
+After=syslog.target network.target
+
+[Service]
+User=root
+Environment="PATH=/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/opt/jupyterhub/bin"
+ExecStart=/opt/jupyterhub/bin/jupyterhub -f /opt/jupyterhub/etc/jupyterhub/jupyterhub_config.py
+
+[Install]
+WantedBy=multi-user.target
+!EOF
+
+## Copy systemd file
+sudo mkdir -p /opt/jupyterhub/etc/systemd
+sudo cp jupyterhub.service /opt/jupyterhub/etc/systemd
+
+## Link systemd file 
+sudo ln -s /opt/jupyterhub/etc/systemd/jupyterhub.service /etc/systemd/system/jupyterhub.service
+
+## Enable service
+sudo systemctl daemon-reload
+sudo systemctl enable jupyterhub.service --now
