@@ -171,6 +171,7 @@ sudo systemctl daemon-reload
 
 ## Install anaconda for user environments
 ## Install Anacononda public gpg key to trusted store
+cd ~
 curl https://repo.anaconda.com/pkgs/misc/gpgkeys/anaconda.asc | gpg --dearmor > conda.gpg
 sudo install -o root -g root -m 644 conda.gpg /etc/apt/trusted.gpg.d/
 
