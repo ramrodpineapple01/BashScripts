@@ -82,3 +82,8 @@ echo 'Starting Jupyterhub from '${CONFIG_FILE}
 sudo jupyterhub -f ${CONFIG_FILE}
 EOF
 sudo chmod +x run-jhub.sh
+
+## Install typical useful libraries
+sudo python3 -m pip install ipyleaflet
+sudo python3 -m pip install pandas
+sudo python3 -m pip install geopandas
