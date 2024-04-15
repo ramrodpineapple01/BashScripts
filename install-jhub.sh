@@ -99,27 +99,27 @@ sudo apt-get update
 sudo apt-get -y install postgresql postgresql-contrib
 
 # Install the SQLAlchemy library for Postgres
-sudo pip install psycopg2-binary
+sudo /opt/jupyterhub/bin/python3 -m pip install psycopg2-binary
 
 # Generate userdb user password 
 password=$(dd if=/dev/urandom bs=18 count=1 2>/dev/null | base64)
-echo ${password}
+echo "jhub_agent:${password}" > ~/db_user.txt
 
 # Create postgres database user
-sudo -u postgres createuser -a jhub
+sudo -u postgres psql -U postgres -c "CREATE ROLE jhub_agent CREATEDB LOGIN PASSWORD '${password}';"
 
 # Create postgres database
-sudo -u postgres createdb jhub
+sudo -u postgres psql -U postgres -c "CREATE DATABASE jhub WITH OWNER = 'jhub_agent';"
 
 # Set postgres database in the configuration
-sudo sed -i "s|# c.JupyterHub.db_url = 'sqlite:///jupyterhub.sqlite'|c.JupyterHub.db_url = 'postgresql+psycopg2://jhub:${password}@127.0.0.1:5432/jhub'|g" jupyterhub_config.py
+sudo sed -i "s|# c.JupyterHub.db_url = 'sqlite:///jupyterhub.sqlite'|c.JupyterHub.db_url = 'postgresql+psycopg2://jhub_agent:${password}@127.0.0.1:5432/jhub'|g" jupyterhub_config.py
 
 ## Copy current configuration file to /etc/JupyterHub
 sudo mkdir -p /etc/jupyterhub
 sudo cp jupyterhub_config.py /etc/jupyterhub
 
 ## Create Startup script
-cat <<!EOF > run-jhub.sh
+cat <<!EOF > ~/run-jhub.sh
 #!/bin/bash
 CONFIG_FILE='/etc/jupyterhub/jupyterhub_config.py'
 
@@ -128,7 +128,7 @@ sudo /opt/jupyterhub/bin/jupyterhub -f ${CONFIG_FILE}
 !EOF
 
 ## Create Config Edit Script
-cat <<!EOF > edit-config.sh
+cat <<!EOF > ~/edit-config.sh
 #!/bin/bash
 
 sudo nano /opt/jupyterhub/etc/jupyterhub/jupyterhub_config.py
@@ -144,7 +144,7 @@ sudo /opt/jupyterhub/bin/python3 -m pip install pandas
 sudo /opt/jupyterhub/bin/python3 -m pip install geopandas
 
 ## Create systemd file
-cat <<!EOF > jupyterhub.service
+cat <<!EOF | sudo tee jupyterhub.service
 [Unit]
 Description=JupyterHub
 After=syslog.target network.target
@@ -167,4 +167,25 @@ sudo ln -s /opt/jupyterhub/etc/systemd/jupyterhub.service /etc/systemd/system/ju
 
 ## Enable service
 sudo systemctl daemon-reload
-sudo systemctl enable jupyterhub.service --now
+#sudo systemctl enable jupyterhub.service --now
+
+## Install anaconda for user environments
+## Install Anacononda public gpg key to trusted store
+curl https://repo.anaconda.com/pkgs/misc/gpgkeys/anaconda.asc | gpg --dearmor > conda.gpg
+sudo install -o root -g root -m 644 conda.gpg /etc/apt/trusted.gpg.d/
+
+## Add Repo
+echo "deb [arch=amd64] https://repo.anaconda.com/pkgs/misc/debrepo/conda stable main" | sudo tee /etc/apt/sources.list.d/conda.list
+
+## Install Conda
+sudo apt-get update
+sudo apt-get install -y conda
+
+## Add Conda setup script
+sudo ln -s /opt/conda/etc/profile.d/conda.sh /etc/profile.d/conda.sh
+
+## Create a default conda environment
+sudo mkdir -p /opt/conda/envs/
+sudo /opt/conda/bin/conda create --prefix /opt/conda/envs/python python=3.10 ipykernel
+
+sudo /opt/conda/envs/python/bin/python -m ipykernel install --prefix=/opt/jupyterhub/ --name 'python' --display-name "Python (default)"
