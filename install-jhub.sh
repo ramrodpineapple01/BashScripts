@@ -172,8 +172,10 @@ sudo systemctl daemon-reload
 #sudo systemctl enable jupyterhub.service --now
 
 ## Install anaconda for user environments
-## Install Anacononda public gpg key to trusted store
+## Back to the home directory
 cd ~
+
+## Install Anacononda public gpg key to trusted store
 curl https://repo.anaconda.com/pkgs/misc/gpgkeys/anaconda.asc | gpg --dearmor > conda.gpg
 sudo install -o root -g root -m 644 conda.gpg /etc/apt/trusted.gpg.d/
 
