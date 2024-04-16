@@ -1,6 +1,9 @@
 #!/bin/bash
 ## copyright R. Dawson 2024
-VERSION='1.1.1'
+VERSION='2.0.1'
+
+# VARIABLES
+IP_ADDRESS=$(hostname -I | cut -d' ' -f1)
 
 printf "Jupyterhub installation script v${VERSION}\n"
 
@@ -49,6 +52,7 @@ sudo python3 -m venv /opt/jupyterhub/
 sudo /opt/jupyterhub/bin/python3 -m pip install wheel
 sudo /opt/jupyterhub/bin/python3 -m pip install jupyterhub
 sudo /opt/jupyterhub/bin/python3 -m pip install jupyterlab notebook  # needed if running the notebook servers in the same environment
+sudo /opt/jupyterhub/bin/python3 -m pip install pycurl
 sudo /opt/jupyterhub/bin/python3 -m pip install ipywidgets
 
 ## Install BASH kernel
@@ -81,7 +85,10 @@ sudo /opt/jupyterhub/bin/jupyterhub --generate-config
 sudo sed -i "s|# c.JupyterHub.internal_ssl = False|c.JupyterHub.internal_ssl = True|g" jupyterhub_config.py
 #sudo sed -i "s|# c.Spawner.default_url = ''|c.Spawner.default_url = '/tree/home/{username}'|g" jupyterhub_config.py
 sudo sed -i "s|# c.Spawner.notebook_dir = ''|c.Spawner.notebook_dir = '~/notebooks'|g" jupyterhub_config.py
+sudo sed -i "s|# c.JupyterHub.bind_url = 'http://:8000'|c.JupyterHub.bind_url = 'http://${IP_ADDRESS}:8000'|g" jupyterhub_config.py
 sudo sed -i "s|# c.Authenticator.admin_users = set()|c.Authenticator.admin_users = {'admin', '${USER}'}|g" jupyterhub_config.py
+sudo sed -i "s|# c.Spawner.cmd = ['jupyterhub-singleuser']|c.Spawner.cmd = ['/opt/jupyterhub/bin/jupyterhub-singleuser']|g" jupyterhub_config.py
+sudo sed -i "s|# c.JupyterHub.trusted_alt_names = []|c.JupyterHub.trusted_alt_names = ['DNS:${HOSTNAME}', 'IP:${IP_ADDRESS}']|g" jupyterhub_config.py
 echo c.LocalAuthenticator.create_system_users=True | sudo tee -a jupyterhub_config.py > /dev/null
 
 ## Install PostgreSQL for production
@@ -193,4 +200,4 @@ sudo ln -s /opt/conda/etc/profile.d/conda.sh /etc/profile.d/conda.sh
 sudo mkdir -p /opt/conda/envs/
 sudo /opt/conda/bin/conda create --prefix /opt/conda/envs/python python=3.10 ipykernel
 
-sudo /opt/conda/envs/python/bin/python -m ipykernel install --prefix=/opt/jupyterhub/ --name 'python' --display-name "Python (default)"
+sudo /opt/conda/envs/python/bin/python -m ipykernel install --prefix=/opt/jupyterhub/ --name 'python' --display-name "Python (conda)"
