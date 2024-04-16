@@ -123,8 +123,8 @@ cat <<!EOF > ~/run-jhub.sh
 #!/bin/bash
 CONFIG_FILE='/etc/jupyterhub/jupyterhub_config.py'
 
-echo 'Starting Jupyterhub from '${CONFIG_FILE}
-sudo /opt/jupyterhub/bin/jupyterhub -f ${CONFIG_FILE}
+echo 'Starting Jupyterhub from \${CONFIG_FILE}'
+sudo /opt/jupyterhub/bin/jupyterhub -f \${CONFIG_FILE}
 !EOF
 
 ## Create Config Edit Script
@@ -136,7 +136,9 @@ sudo nano /opt/jupyterhub/etc/jupyterhub/jupyterhub_config.py
 sudo cp /opt/jupyterhub/etc/jupyterhub/jupyterhub_config.py /etc/jupyterhub/jupyterhub_config.py
 !EOF
 
-sudo chmod +x run-jhub.sh
+## Make home directory scripts executable
+sudo chmod +x ~/run-jhub.sh
+sudo chmod +x ~/edit-config.sh
 
 ## Install typical useful libraries
 sudo /opt/jupyterhub/bin/python3 -m pip install ipyleaflet
