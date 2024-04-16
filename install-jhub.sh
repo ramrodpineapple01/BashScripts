@@ -82,13 +82,13 @@ sudo /opt/jupyterhub/bin/jupyterhub --generate-config
 
 ## Initial security setup 
 ## This also makes the installation user a JHub admin
-sudo sed -i "s|# c.JupyterHub.internal_ssl = False|c.JupyterHub.internal_ssl = True|g" /opt/jupyterhub/etc/jupyterhub/jupyterhub_config.py
-sudo sed -i "s|# c.Spawner.notebook_dir = ''|c.Spawner.notebook_dir = '~/notebooks'|g" /opt/jupyterhub/etc/jupyterhub/jupyterhub_config.py
-sudo sed -i "s|# c.JupyterHub.bind_url = 'http://:8000'|c.JupyterHub.bind_url = 'http://${IP_ADDRESS}:8000'|g" /opt/jupyterhub/etc/jupyterhub/jupyterhub_config.py
-sudo sed -i "s|# c.Authenticator.admin_users = set()|c.Authenticator.admin_users = {'admin', '${USER}'}|g" /opt/jupyterhub/etc/jupyterhub/jupyterhub_config.py
-sudo sed -i "s|# c.Spawner.cmd = ['jupyterhub-singleuser']|c.Spawner.cmd = ['/opt/jupyterhub/bin/jupyterhub-singleuser']|g" /opt/jupyterhub/etc/jupyterhub/jupyterhub_config.py
-sudo sed -i "s|# c.JupyterHub.trusted_alt_names = []|c.JupyterHub.trusted_alt_names = ['DNS:${HOSTNAME}', 'IP:${IP_ADDRESS}']|g" /opt/jupyterhub/etc/jupyterhub/jupyterhub_config.py
-sudo sed -i "s|# c.Authenticator.delete_invalid_users = False|c.Authenticator.delete_invalid_users = True|g" /opt/jupyterhub/etc/jupyterhub/jupyterhub_config.py
+sudo sed -i "s|# c.JupyterHub.internal_ssl = False|c.JupyterHub.internal_ssl = True|g" jupyterhub_config.py
+sudo sed -i "s|# c.Spawner.notebook_dir = ''|c.Spawner.notebook_dir = '~/notebooks'|g" jupyterhub_config.py
+sudo sed -i "s|# c.JupyterHub.bind_url = 'http://:8000'|c.JupyterHub.bind_url = 'http://${IP_ADDRESS}:8000'|g" jupyterhub_config.py
+sudo sed -i "s|# c.Authenticator.admin_users = set()|c.Authenticator.admin_users = {'admin', '${USER}'}|g" jupyterhub_config.py
+sudo sed -i "s|# c.Spawner.cmd = ['jupyterhub-singleuser']|c.Spawner.cmd = ['/opt/jupyterhub/bin/jupyterhub-singleuser']|g" jupyterhub_config.py
+sudo sed -i "s|# c.JupyterHub.trusted_alt_names = []|c.JupyterHub.trusted_alt_names = ['DNS:${HOSTNAME}', 'IP:${IP_ADDRESS}']|g" jupyterhub_config.py
+sudo sed -i "s|# c.Authenticator.delete_invalid_users = False|c.Authenticator.delete_invalid_users = True|g" jupyterhub_config.py
 echo c.LocalAuthenticator.create_system_users=True | sudo tee -a /opt/jupyterhub/etc/jupyterhub/jupyterhub_config.py > /dev/null
 
 ## Install PostgreSQL for production
