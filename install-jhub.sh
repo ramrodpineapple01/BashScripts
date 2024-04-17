@@ -1,6 +1,6 @@
 #!/bin/bash
 ## copyright R. Dawson 2024
-VERSION='2.0.1'
+VERSION='2.0.2'
 
 # VARIABLES
 IP_ADDRESS=$(hostname -I | cut -d' ' -f1)
@@ -201,3 +201,10 @@ sudo mkdir -p /opt/conda/envs/
 sudo /opt/conda/bin/conda create --prefix /opt/conda/envs/python python=3.10 ipykernel
 
 sudo /opt/conda/envs/python/bin/python -m ipykernel install --prefix=/opt/jupyterhub/ --name 'python' --display-name "Python (conda)"
+
+
+## Add current hostname to /etc/hosts
+echo "Make sure your hostname is correct in /etc/hosts"
+echo ${IP_ADDRESS} ${HOSTNAME} | sudo tee -a /etc/hosts > /dev/null
+
+echo "Installation complete.  Use run-jhub.sh to start JupyterHub or enable jupyterhub.service"
