@@ -25,6 +25,7 @@ sudo sed -i 's|//Unattended-Upgrade::Remove-Unused-Kernel-Packages "true";|Unatt
 sudo sed -i 's|//Unattended-Upgrade::Unattended-Upgrade::Remove-New-Unused-Dependencies "false";|Unattended-Upgrade::Unattended-Upgrade::Remove-New-Unused-Dependencies "true";|g' /etc/apt/apt.conf.d/50unattended-upgrades
 sudo sed -i 's|//Unattended-Upgrade::Remove-Unused-Dependencies "false";|Unattended-Upgrade::Remove-Unused-Dependencies "true";|g' /etc/apt/apt.conf.d/50unattended-upgrades
 
+sudo ufw allow ssh
 sudo ufw allow http
 sudo ufw allow https
 sudo ufw allow 8000
