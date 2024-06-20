@@ -1,6 +1,6 @@
 #!/bin/bash
 ## copyright R. Dawson 2024
-VERSION='2.0.2'
+VERSION='2.1.0'
 
 # VARIABLES
 IP_ADDRESS=$(hostname -I | cut -d' ' -f1)
@@ -43,7 +43,7 @@ curl -fsSL https://deb.nodesource.com/setup_21.x | sudo -E bash - &&\
 sudo apt-get -y install nodejs
 
 ## Install configurable-proxy
-sudo npm install -g configurable-http-proxy
+#sudo npm install -g configurable-http-proxy
 
 ## Create Virtual Environment for Jupyterhub
 sudo python3 -m venv /opt/jupyterhub/
@@ -65,6 +65,17 @@ sudo /opt/jupyterhub/bin/python3 -m pip install jupyter-ai
 ## Add /notebooks directory to all new users (and current user)
 sudo mkdir /etc/skel/notebooks
 mkdir ~/notebooks
+
+## Add Data Directory
+sudo mkdir -p /srv/jupyterhub/data
+sudo ln -s /etc/skel/data /srv/jupyterhub/data
+
+## Add Shared Directory
+sudo mkdir -p /srv/jupyterhub/shared
+sudo chown  root:jupyterhub-users /srv/jupyterhub/shared
+sudo chmod 777 /srv/jupyterhub/shared
+sudo chmod g+s /srv/jupyterhub/shared
+sudo ln -s /etc/skel/shared /srv/jupyterhub/shared
 
 ## Create an admin user
 username=admin
@@ -148,7 +159,7 @@ sudo chmod +x ~/run-jhub.sh
 sudo chmod +x ~/edit-config.sh
 
 ## Install typical useful libraries
-sudo /opt/jupyterhub/bin/python3 -m pip install ipyleaflet
+sudo /opt/jupyterhub/bin/python3 -m pip install folium
 sudo /opt/jupyterhub/bin/python3 -m pip install pandas
 sudo /opt/jupyterhub/bin/python3 -m pip install geopandas
 
@@ -176,31 +187,31 @@ sudo ln -s /opt/jupyterhub/etc/systemd/jupyterhub.service /etc/systemd/system/ju
 
 ## Enable service
 sudo systemctl daemon-reload
-#sudo systemctl enable jupyterhub.service --now
+sudo systemctl enable jupyterhub.service --now
 
-## Install anaconda for user environments
-## Back to the home directory
-cd ~
+# ## Install anaconda for user environments
+# ## Back to the home directory
+# cd ~
 
-## Install Anacononda public gpg key to trusted store
-curl https://repo.anaconda.com/pkgs/misc/gpgkeys/anaconda.asc | gpg --dearmor > conda.gpg
-sudo install -o root -g root -m 644 conda.gpg /etc/apt/trusted.gpg.d/
+# ## Install Anacononda public gpg key to trusted store
+# curl https://repo.anaconda.com/pkgs/misc/gpgkeys/anaconda.asc | gpg --dearmor > conda.gpg
+# sudo install -o root -g root -m 644 conda.gpg /etc/apt/trusted.gpg.d/
 
-## Add Repo
-echo "deb [arch=amd64] https://repo.anaconda.com/pkgs/misc/debrepo/conda stable main" | sudo tee /etc/apt/sources.list.d/conda.list
+# ## Add Repo
+# echo "deb [arch=amd64] https://repo.anaconda.com/pkgs/misc/debrepo/conda stable main" | sudo tee /etc/apt/sources.list.d/conda.list
 
-## Install Conda
-sudo apt-get update
-sudo apt-get install -y conda
+# ## Install Conda
+# sudo apt-get update
+# sudo apt-get install -y conda
 
-## Add Conda setup script
-sudo ln -s /opt/conda/etc/profile.d/conda.sh /etc/profile.d/conda.sh
+# ## Add Conda setup script
+# sudo ln -s /opt/conda/etc/profile.d/conda.sh /etc/profile.d/conda.sh
 
-## Create a default conda environment
-sudo mkdir -p /opt/conda/envs/
-sudo /opt/conda/bin/conda create --prefix /opt/conda/envs/python python=3.10 ipykernel
+# ## Create a default conda environment
+# sudo mkdir -p /opt/conda/envs/
+# sudo /opt/conda/bin/conda create --prefix /opt/conda/envs/python python=3.10 ipykernel
 
-sudo /opt/conda/envs/python/bin/python -m ipykernel install --prefix=/opt/jupyterhub/ --name 'python' --display-name "Python (conda)"
+# sudo /opt/conda/envs/python/bin/python -m ipykernel install --prefix=/opt/jupyterhub/ --name 'python' --display-name "Python (conda)"
 
 
 ## Add current hostname to /etc/hosts
