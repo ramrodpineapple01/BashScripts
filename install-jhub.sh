@@ -163,7 +163,10 @@ sudo chmod +x ~/edit-config.sh
 
 ## Install typical useful libraries
 sudo /opt/jupyterhub/bin/python3 -m pip install folium
+sudo /opt/jupyterhub/bin/python3 -m pip install matplotlib
+sudo /opt/jupyterhub/bin/python3 -m pip install numpy
 sudo /opt/jupyterhub/bin/python3 -m pip install pandas
+sudo /opt/jupyterhub/bin/python3 -m pip install plotly
 sudo /opt/jupyterhub/bin/python3 -m pip install geopandas
 
 ## Create systemd file
