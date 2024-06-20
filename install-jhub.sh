@@ -43,7 +43,7 @@ curl -fsSL https://deb.nodesource.com/setup_21.x | sudo -E bash - &&\
 sudo apt-get -y install nodejs
 
 ## Install configurable-proxy
-#sudo npm install -g configurable-http-proxy
+sudo npm install -g configurable-http-proxy
 
 ## Create Virtual Environment for Jupyterhub
 sudo python3 -m venv /opt/jupyterhub/
@@ -66,16 +66,19 @@ sudo /opt/jupyterhub/bin/python3 -m pip install jupyter-ai
 sudo mkdir /etc/skel/notebooks
 mkdir ~/notebooks
 
-## Add Data Directory
+## Add Data directory to all new users (and current user)
 sudo mkdir -p /srv/jupyterhub/data
 sudo ln -s /etc/skel/data /srv/jupyterhub/data
+sudo ln -s /etc/skel/data ~/data
 
-## Add Shared Directory
+## Add Shared directory to all new users (and current user)
 sudo mkdir -p /srv/jupyterhub/shared
+mkdir ~/shared
 sudo chown  root:jupyterhub-users /srv/jupyterhub/shared
 sudo chmod 777 /srv/jupyterhub/shared
 sudo chmod g+s /srv/jupyterhub/shared
 sudo ln -s /etc/skel/shared /srv/jupyterhub/shared
+sudo ln -s /etc/skel/shared ~/shared
 
 ## Create an admin user
 username=admin
