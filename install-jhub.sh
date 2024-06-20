@@ -1,6 +1,6 @@
 #!/bin/bash
 ## copyright R. Dawson 2024
-VERSION='2.1.0'
+VERSION='2.1.1'
 
 # VARIABLES
 IP_ADDRESS=$(hostname -I | cut -d' ' -f1)
@@ -132,9 +132,9 @@ sudo -u postgres psql -U postgres -c "CREATE DATABASE jhub WITH OWNER = 'jhub_ag
 # Set postgres database in the configuration
 sudo sed -i "s|# c.JupyterHub.db_url = 'sqlite:///jupyterhub.sqlite'|c.JupyterHub.db_url = 'postgresql+psycopg2://jhub_agent:${password}@127.0.0.1:5432/jhub'|g" jupyterhub_config.py
 
-## Copy current configuration file to /etc/JupyterHub
+## Link current configuration file to /etc/JupyterHub
 sudo mkdir -p /etc/jupyterhub
-sudo cp jupyterhub_config.py /etc/jupyterhub
+sudo ln -s /opt/jupyterhub/etc/jupyterhub/jupyterhub_config.py /etc/jupyterhub/jupyterhub_config.py
 
 ## Create Startup script
 cat <<!EOF > ~/run-jhub.sh
