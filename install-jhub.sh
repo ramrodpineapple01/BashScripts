@@ -111,6 +111,7 @@ sudo sed -i "s|# c.Authenticator.admin_users = set()|c.Authenticator.admin_users
 sudo sed -i "s|# c.JupyterHub.trusted_alt_names = []|c.JupyterHub.trusted_alt_names = ['DNS:${HOSTNAME}','IP:${IP_ADDRESS}']|g" jupyterhub_config.py
 sudo sed -i "s|# c.Spawner.cmd = ['jupyterhub-singleuser']|c.Spawner.cmd = ['/opt/jupyterhub/bin/jupyterhub-singleuser']|g" jupyterhub_config.py
 sudo sed -i "s|# c.Authenticator.delete_invalid_users = False|c.Authenticator.delete_invalid_users = True|g" jupyterhub_config.py
+sudo sed -i "s|# c.Authenticator.allow_all = False|# c.Authenticator.allow_all = False\nc.Authenticator.allow_all = True|g" jupyterhub_config.py
 echo c.LocalAuthenticator.create_system_users=True | sudo tee -a /opt/jupyterhub/etc/jupyterhub/jupyterhub_config.py > /dev/null
 
 ## Install PostgreSQL for production
