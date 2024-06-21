@@ -76,8 +76,8 @@ mkdir ~/notebooks
 
 ## Add Data directory to all new users (and current user)
 sudo mkdir -p /srv/jupyterhub/data
-sudo ln -s /etc/skel/data /srv/jupyterhub/data
-sudo ln -s /etc/skel/data ~/data
+sudo ln -s /etc/skel/notebooks/data /srv/jupyterhub/data
+sudo ln -s ~/notebooks/data /srv/jupyterhub/data
 
 ## Add Shared directory to all new users (and current user)
 sudo mkdir -p /srv/jupyterhub/shared
@@ -85,8 +85,8 @@ mkdir ~/shared
 sudo chown  root:jupyterhub-users /srv/jupyterhub/shared
 sudo chmod 777 /srv/jupyterhub/shared
 sudo chmod g+s /srv/jupyterhub/shared
-sudo ln -s /etc/skel/shared /srv/jupyterhub/shared
-sudo ln -s /etc/skel/shared ~/shared
+sudo ln -s /etc/skel/notebooks/shared /srv/jupyterhub/shared
+sudo ln -s ~/notebooks/shared /srv/jupyterhub/shared
 
 ## Create an admin user
 username=admin
