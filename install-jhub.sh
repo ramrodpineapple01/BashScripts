@@ -76,8 +76,8 @@ mkdir ~/notebooks
 
 ## Add Data directory to all new users (and current user)
 sudo mkdir -p /srv/jupyterhub/data
-sudo ln -s /etc/skel/notebooks/data /srv/jupyterhub/data
-sudo ln -s ~/notebooks/data /srv/jupyterhub/data
+sudo ln -s /srv/jupyterhub/data /etc/skel/notebooks/data 
+sudo ln -s /srv/jupyterhub/data ~/notebooks/data 
 
 ## Add Shared directory to all new users (and current user)
 sudo mkdir -p /srv/jupyterhub/shared
@@ -85,8 +85,8 @@ mkdir ~/shared
 sudo chown  root:jupyterhub-users /srv/jupyterhub/shared
 sudo chmod 777 /srv/jupyterhub/shared
 sudo chmod g+s /srv/jupyterhub/shared
-sudo ln -s /etc/skel/notebooks/shared /srv/jupyterhub/shared
-sudo ln -s ~/notebooks/shared /srv/jupyterhub/shared
+sudo ln -s /srv/jupyterhub/shared /etc/skel/notebooks/shared
+sudo ln -s /srv/jupyterhub/shared ~/notebooks/shared
 
 ## Create an admin user
 username=admin
@@ -171,12 +171,23 @@ sudo chmod +x ~/run-jhub.sh
 sudo chmod +x ~/edit-config.sh
 
 ## Install typical useful libraries
+sudo /opt/jupyterhub/bin/python3 -m pip install dash
+sudo /opt/jupyterhub/bin/python3 -m pip install defusedxml
 sudo /opt/jupyterhub/bin/python3 -m pip install folium
+sudo /opt/jupyterhub/bin/python3 -m pip install geopandas
+sudo /opt/jupyterhub/bin/python3 -m pip install h3
+sudo /opt/jupyterhub/bin/python3 -m pip install ipywidgets
 sudo /opt/jupyterhub/bin/python3 -m pip install matplotlib
+sudo /opt/jupyterhub/bin/python3 -m pip install networkx
 sudo /opt/jupyterhub/bin/python3 -m pip install numpy
+sudo /opt/jupyterhub/bin/python3 -m pip install openpyxl
 sudo /opt/jupyterhub/bin/python3 -m pip install pandas
 sudo /opt/jupyterhub/bin/python3 -m pip install plotly
-sudo /opt/jupyterhub/bin/python3 -m pip install geopandas
+sudo /opt/jupyterhub/bin/python3 -m pip install scikit-learn
+sudo /opt/jupyterhub/bin/python3 -m pip install scipy
+sudo /opt/jupyterhub/bin/python3 -m pip install seaborn
+sudo /opt/jupyterhub/bin/python3 -m pip install tqdm
+sudo /opt/jupyterhub/bin/python3 -m pip install tzlocal
 
 ## Create systemd file
 cat <<!EOF | sudo tee jupyterhub.service
