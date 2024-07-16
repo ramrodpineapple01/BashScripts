@@ -67,6 +67,10 @@ sudo /opt/jupyterhub/bin/python3 -m pip install ipywidgets
 sudo /opt/jupyterhub/bin/python3 -m pip install bash_kernel
 sudo /opt/jupyterhub/bin/python3 -m bash_kernel.install
 
+## Install R kernel
+sudo R -e "install.packages('IRkernel')"
+sudo R -e "IRkernel::installspec(user = FALSE)"
+
 ## Install Jupyter AI
 sudo /opt/jupyterhub/bin/python3 -m pip install jupyter-ai
 
@@ -86,7 +90,7 @@ sudo chown  root:jupyterhub-users /srv/jupyterhub/shared
 sudo chmod 777 /srv/jupyterhub/shared
 sudo chmod g+s /srv/jupyterhub/shared
 sudo ln -s /srv/jupyterhub/shared /etc/skel/notebooks/shared
-sudo ln -s /srv/jupyterhub/shared ~/notebooks/shared
+
 
 ## Create an admin user
 username=admin
