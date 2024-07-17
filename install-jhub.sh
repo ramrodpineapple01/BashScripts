@@ -69,8 +69,8 @@ sudo /opt/jupyterhub/bin/python3 -m bash_kernel.install
 
 ## Install R kernel
 sudo R -e "install.packages('IRkernel')"
-PATH=$PATH:/opt/jupyterhub/bin/
-R -e "IRkernel::installspec()"
+sudo env PATH=$PATH:/opt/jupyterhub/bin/
+sudo R -e "IRkernel::installspec(user=FALSE)"
 
 ## Install Jupyter AI
 sudo /opt/jupyterhub/bin/python3 -m pip install jupyter-ai
